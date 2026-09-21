@@ -29,6 +29,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddTransient<IDatabaseHelper, DatabaseHelper>();
 builder.Services.AddTransient<IUserBusiness, UserBusiness>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IKhachHangBusiness, KhachHangBusiness>();
+builder.Services.AddTransient<IKhachHangRepository, KhachHangRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BLL.Helper;
 
 namespace BLL
 {
@@ -25,10 +26,12 @@ namespace BLL
         }
         public bool Create(User thongtin)
         {
+            thongtin.Matkhau = SecurityHelper.HashPassword(thongtin.Matkhau);
             return _res.Create(thongtin);
         }
         public bool Update(User thongtin)
         {
+            thongtin.Matkhau = SecurityHelper.HashPassword(thongtin.Matkhau);
             return _res.Update(thongtin);
         }
         public bool Delete(string user_Id)

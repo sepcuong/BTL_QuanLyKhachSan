@@ -3,6 +3,7 @@ using BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model;
+
 namespace API.Controllers
 {
     //[Authorize]
@@ -31,6 +32,7 @@ namespace API.Controllers
             try
             {
                 thongtin.User_Id = Guid.NewGuid().ToString();
+                //thongtin.Matkhau = 
                 bool isCreate = _userBusiness.Create(thongtin);
                 if (isCreate)
                     return Ok(thongtin);

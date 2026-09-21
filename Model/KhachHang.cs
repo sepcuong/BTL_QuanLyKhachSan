@@ -5,17 +5,17 @@ namespace Model;
 
 public partial class KhachHang
 {
-    public string MaKhachHang { get; set; } = null!;
+    public string Ma_Khach_Hang { get; set; } = null!;
 
-    public string HoTen { get; set; } = null!;
+    public string Ho_Ten { get; set; } = null!;
 
-    public string? CmndCccd { get; set; }
+    public string? Cmnd_Cccd { get; set; }
 
-    public string? SoDienThoai { get; set; }
+    public string? So_Dien_Thoai { get; set; }
 
     public string? Email { get; set; }
 
-    public string? DiaChi { get; set; }
+    public string? Dia_Chi { get; set; }
 
-    public virtual ICollection<DatPhong> DatPhongs { get; set; } = new List<DatPhong>();
+    //public virtual ICollection<DatPhong> DatPhongs { get; set; } = new List<DatPhong>();
 }

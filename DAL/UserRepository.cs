@@ -3,6 +3,7 @@ using Dapper;
 using Model;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,9 +25,10 @@ namespace DAL
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
-                    string sql = "SELECT TOP (1000) * FROM [dbo].[user]";
-                    var users = connection.Query<User>(sql).ToList();
-                    return users;
+                    return connection.Query<User>(
+                        "sp_User_GetAll",
+                        commandType: CommandType.StoredProcedure
+                    ).ToList();
                 }
             }
             catch (Exception ex)
@@ -40,20 +42,23 @@ namespace DAL
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
-                    string checkSql = "SELECT COUNT(1) FROM [dbo].[user] WHERE [taikhoan] = @Taikhoan";
-
-                    int exists = connection.ExecuteScalar<int>(checkSql, new { Taikhoan = thongtin.Taikhoan });
-
-                    if (exists > 0)
-                    {
-                        throw new Exception("Tài khoản này đã tồn tại trong hệ thống. Vui lòng chọn tên tài khoản khác!");
-                    }
-                    string sql = @"INSERT INTO [dbo].[user] 
-                                 ([user_id], [hoten], [ngaysinh], [diachi], [gioitinh], [email], [taikhoan], [matkhau], [role], [image_url])
-                                 VALUES 
-                                 (@User_Id, @Hoten, @Ngaysinh, @Diachi, @Gioitinh, @Email, @Taikhoan, @Matkhau, @Role, @Image_Url)";
-                    int rowsAffected = connection.Execute(sql, thongtin);
-                    return rowsAffected > 0;
+                    return connection.Execute(
+                        "sp_User_Create",
+                        new
+                        {
+                            thongtin.User_Id,
+                            thongtin.Hoten,
+                            thongtin.Ngaysinh,
+                            thongtin.Diachi,
+                            thongtin.Gioitinh,
+                            thongtin.Email,
+                            thongtin.Taikhoan,
+                            thongtin.Matkhau,
+                            thongtin.Role,
+                            thongtin.Image_Url
+                        },
+                        commandType: CommandType.StoredProcedure
+                    ) > 0;
                 }
                 //return true;
             }
@@ -68,19 +73,23 @@ namespace DAL
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
-                    string sql = @"UPDATE [dbo].[user] 
-                                 SET [hoten] = @Hoten, 
-                                     [ngaysinh] = @Ngaysinh, 
-                                     [diachi] = @Diachi, 
-                                     [gioitinh] = @Gioitinh, 
-                                     [email] = @Email, 
-                                     [taikhoan] = @Taikhoan, 
-                                     [matkhau] = @Matkhau, 
-                                     [role] = @Role, 
-                                     [image_url] = @Image_Url
-                                 WHERE [user_id] = @User_Id";
-                    int rowsAffected = connection.Execute(sql, thongtin);
-                    return rowsAffected > 0;
+                    return connection.Execute(
+                        "sp_User_Update",
+                        new
+                        {
+                            thongtin.User_Id,
+                            thongtin.Hoten,
+                            thongtin.Ngaysinh,
+                            thongtin.Diachi,
+                            thongtin.Gioitinh,
+                            thongtin.Email,
+                            thongtin.Taikhoan,
+                            thongtin.Matkhau,
+                            thongtin.Role,
+                            thongtin.Image_Url
+                        },
+                        commandType: CommandType.StoredProcedure
+                    ) > 0;
                 }
             }
             catch (Exception ex)
@@ -94,9 +103,11 @@ namespace DAL
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
-                    string sql = @"DELETE FROM [dbo].[user] WHERE [user_id] = @User_Id";
-                    int rowsAffected = connection.Execute(sql, new { User_Id = user_Id });
-                    return rowsAffected > 0;
+                    return connection.Execute(
+                        "sp_User_Delete",
+                        new { User_Id = user_Id },
+                        commandType: CommandType.StoredProcedure
+                    ) > 0;
                 }
             }
             catch (Exception ex)
@@ -110,9 +121,11 @@ namespace DAL
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
-                    string sql = @"SELECT TOP (1000)* FROM [dbo].[user] WHERE [user_id] = @User_Id";
-                    var user = connection.QueryFirstOrDefault<User>(sql, new { User_Id = user_Id });
-                    return user;
+                    return connection.QueryFirstOrDefault<User>(
+                        "sp_User_GetById",
+                        new { User_Id = user_Id },
+                        commandType: CommandType.StoredProcedure
+                    );
                 }
             }
             catch (Exception ex)
@@ -126,12 +139,11 @@ namespace DAL
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
-                    string sql = @"SELECT TOP (1000) * FROM [dbo].[user] 
-                                   WHERE [hoten] LIKE @Keyword OR 
-                                         [taikhoan] LIKE @Keyword OR 
-                                         [email] LIKE @Keyword";
-                    var users = connection.Query<User>(sql, new { Keyword = $"%{keyword}%" }).ToList();
-                    return users;
+                    return connection.Query<User>(
+                        "sp_User_Search",
+                        new { Keyword = $"%{keyword}%" },
+                        commandType: CommandType.StoredProcedure
+                    ).ToList();
                 }
             }
             catch (Exception ex)

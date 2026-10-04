@@ -5,17 +5,17 @@ namespace Model;
 
 public partial class LoaiPhong
 {
-    public string MaLoaiPhong { get; set; } = null!;
+    public string Ma_Loai_Phong { get; set; } = null!;
 
-    public string TenLoaiPhong { get; set; } = null!;
+    public string Ten_Loai_Phong { get; set; } = null!;
 
-    public double GiaMacDinh { get; set; }
+    public double Gia_Mac_Dinh { get; set; }
 
-    public int? SoNguoiChuan { get; set; }
+    public int? So_Nguoi_Chuan { get; set; }
 
-    public string? MoTa { get; set; }
+    public string? Mo_Ta { get; set; }
 
-    public virtual ICollection<GiaPhong> GiaPhongs { get; set; } = new List<GiaPhong>();
+    //public virtual ICollection<GiaPhong> GiaPhongs { get; set; } = new List<GiaPhong>();
 
-    public virtual ICollection<Phong> Phongs { get; set; } = new List<Phong>();
+    //public virtual ICollection<Phong> Phongs { get; set; } = new List<Phong>();
 }

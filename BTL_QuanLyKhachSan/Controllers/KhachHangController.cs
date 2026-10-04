@@ -28,10 +28,8 @@ namespace API.Controllers
             try
             {
                 thongtin.Ma_Khach_Hang = Guid.NewGuid().ToString();
-                bool isCreate = _khachHangBusiness.Create(thongtin);
-                if (isCreate)
-                    return Ok(thongtin);
-                return BadRequest(new { message = "Không thể tạo khách hàng!" });
+                var isCreate = _khachHangBusiness.Create(thongtin);
+                return Ok(thongtin);
             }
             catch (Exception ex)
             {

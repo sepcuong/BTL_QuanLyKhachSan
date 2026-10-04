@@ -33,10 +33,8 @@ namespace API.Controllers
             {
                 thongtin.User_Id = Guid.NewGuid().ToString();
                 //thongtin.Matkhau = 
-                bool isCreate = _userBusiness.Create(thongtin);
-                if (isCreate)
-                    return Ok(thongtin);
-                return BadRequest(new { message = "Không thể tạo người dùng!" });
+                var isCreate = _userBusiness.Create(thongtin);
+                return Ok(thongtin);
                 //return thongtin;
             } catch (Exception ex)
             {

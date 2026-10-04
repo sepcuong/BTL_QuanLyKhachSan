@@ -10,46 +10,45 @@ using System.Data;
 
 namespace DAL
 {
-    public partial class KhachHangRepository : IKhachHangRepository
+    public partial class LoaiPhongRepository: ILoaiPhongRepository
     {
         private readonly IDatabaseHelper _dbHelper;
-        public KhachHangRepository(IDatabaseHelper dbHelper)
+        public LoaiPhongRepository(IDatabaseHelper dbHelper)
         {
             _dbHelper = dbHelper;
         }
-        public List<KhachHang> GetAllKhachHang()
+        public List<LoaiPhong> GetAllLoaiPhong()
         {
             try
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
-                    return connection.Query<KhachHang>(
-                        "sp_KhachHang_GetAll",
+                    return connection.Query<LoaiPhong>(
+                        "sp_LoaiPhong_GetAll",
                         commandType: CommandType.StoredProcedure
                     ).ToList();
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Lỗi không thể trích xuất dữ liệu: {ex.Message}", ex);
+                throw new Exception($"Lỗi không thể trích xuất LoaiPhong: {ex.Message}", ex);
             }
         }
-        public bool Create(KhachHang thongtin)
+        public bool Create(LoaiPhong thongtin)
         {
             try
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
                     return connection.Execute(
-                        "sp_KhachHang_Create",
+                        "sp_LoaiPhong_Create",
                         new
                         {
-                            thongtin.Ma_Khach_Hang,
-                            thongtin.Ho_Ten,
-                            thongtin.Cmnd_Cccd,
-                            thongtin.So_Dien_Thoai,
-                            thongtin.Email,
-                            thongtin.Dia_Chi
+                            thongtin.Ma_Loai_Phong,
+                            thongtin.Ten_Loai_Phong,
+                            thongtin.Gia_Mac_Dinh,
+                            thongtin.So_Nguoi_Chuan,
+                            thongtin.Mo_Ta
                         },
                         commandType: CommandType.StoredProcedure
                     ) > 0;
@@ -57,25 +56,24 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new Exception($"Lỗi không thể tạo LoaiPhong: {ex.Message}", ex);
             }
         }
-        public bool Update(KhachHang thongtin)
+        public bool Update(LoaiPhong thongtin)
         {
             try
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
                     return connection.Execute(
-                        "sp_KhachHang_Update",
+                        "sp_LoaiPhong_Update",
                         new
                         {
-                            thongtin.Ma_Khach_Hang,
-                            thongtin.Ho_Ten,
-                            thongtin.Cmnd_Cccd,
-                            thongtin.So_Dien_Thoai,
-                            thongtin.Email,
-                            thongtin.Dia_Chi
+                            thongtin.Ma_Loai_Phong,
+                            thongtin.Ten_Loai_Phong,
+                            thongtin.Gia_Mac_Dinh,
+                            thongtin.So_Nguoi_Chuan,
+                            thongtin.Mo_Ta
                         },
                         commandType: CommandType.StoredProcedure
                     ) > 0;
@@ -83,53 +81,53 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new Exception($"Lỗi không thể cập nhật LoaiPhong: {ex.Message}", ex);
             }
         }
-        public bool Delete(string maKhachHang)
+        public bool Delete(string maLoaiPhong)
         {
             try
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
                     return connection.Execute(
-                        "sp_KhachHang_Delete",
-                        new { Ma_Khach_Hang = maKhachHang },
+                        "sp_LoaiPhong_Delete",
+                        new { Ma_Loai_Phong = maLoaiPhong },
                         commandType: CommandType.StoredProcedure
                     ) > 0;
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new Exception($"Lỗi không thể xóa LoaiPhong: {ex.Message}", ex);
             }
         }
-        public KhachHang GetById(string maKhachHang)
+        public LoaiPhong GetLoaiPhongById(string maLoaiPhong)
         {
             try
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
-                    return connection.QueryFirstOrDefault<KhachHang>(
-                        "sp_KhachHang_GetById",
-                        new { Ma_Khach_Hang = maKhachHang },
+                    return connection.QueryFirstOrDefault<LoaiPhong>(
+                        "sp_LoaiPhong_GetById",
+                        new { Ma_Loai_Phong = maLoaiPhong },
                         commandType: CommandType.StoredProcedure
                     );
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new Exception($"Lỗi không thể trích xuất LoaiPhong theo ID: {ex.Message}", ex);
             }
         }
-        public List<KhachHang> Search(string keyword)
+        public List<LoaiPhong> Search(string keyword)
         {
             try
             {
                 using (var connection = _dbHelper.CreateConnection())
                 {
-                    return connection.Query<KhachHang>(
-                        "sp_KhachHang_Search",
+                    return connection.Query<LoaiPhong>(
+                        "sp_LoaiPhong_Search",
                         new { Keyword = keyword },
                         commandType: CommandType.StoredProcedure
                     ).ToList();
@@ -137,7 +135,7 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new Exception($"Lỗi không thể tìm kiếm LoaiPhong: {ex.Message}", ex);
             }
         }
     }

@@ -66,8 +66,15 @@ namespace API.Controllers
             {
                 string loaiPhong_Id = "";
                 if (formData.Keys.Contains("loaiPhong_Id") && !string.IsNullOrEmpty(Convert.ToString(formData["loaiPhong_Id"]))) { loaiPhong_Id = Convert.ToString(formData["loaiPhong_Id"]); }
-                var result = _loaiPhongBusiness.Delete(loaiPhong_Id);
-                return Ok(result);
+                bool result = _loaiPhongBusiness.Delete(loaiPhong_Id);
+                if (result)
+                {
+                    return Ok(new { message = "Xóa loại phòng thành công" });
+                }
+                else
+                {
+                    return BadRequest(new { message = "Xóa loại phòng thất bại" });
+                }
             }
             catch (Exception ex)
             {

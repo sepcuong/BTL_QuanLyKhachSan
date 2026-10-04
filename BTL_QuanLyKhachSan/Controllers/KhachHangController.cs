@@ -64,7 +64,7 @@ namespace API.Controllers
             {
                 string khachHang_Id = "";
                 if (formData.Keys.Contains("khachHang_Id") && !string.IsNullOrEmpty(Convert.ToString(formData["khachHang_Id"]))) { khachHang_Id = Convert.ToString(formData["khachHang_Id"]); }
-                bool isDelete = _khachHangBusiness.Delete(khachHang_Id);
+                var isDelete = _khachHangBusiness.Delete(khachHang_Id);
                 if (isDelete)
                 {
                     return Ok(new { message = "Xóa khách hàng thành công!" });
@@ -76,6 +76,10 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message != null && ex.Message.Contains("Không thể xóa khách hàng"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }

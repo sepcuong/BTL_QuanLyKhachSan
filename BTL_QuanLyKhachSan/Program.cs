@@ -33,7 +33,10 @@ builder.Services.AddTransient<IKhachHangBusiness, KhachHangBusiness>();
 builder.Services.AddTransient<IKhachHangRepository, KhachHangRepository>();
 builder.Services.AddTransient<ILoaiPhongBusiness, LoaiPhongBusiness>();
 builder.Services.AddTransient<ILoaiPhongRepository, LoaiPhongRepository>();
-
+builder.Services.AddTransient<IPhongBusiness, PhongBusiness>();
+builder.Services.AddTransient<IPhongRepository, PhongRepository>();
+builder.Services.AddTransient<IGiaPhongBusiness, GiaPhongBusiness>();
+builder.Services.AddTransient<IGiaPhongRepository, GiaPhongRepository>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

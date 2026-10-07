@@ -5,19 +5,19 @@ namespace Model;
 
 public partial class GiaPhong
 {
-    public string MaGia { get; set; } = null!;
+    public string Ma_Gia { get; set; } = null!;
 
-    public string MaLoaiPhong { get; set; } = null!;
+    public string Ma_Loai_Phong { get; set; } = null!;
 
-    public string TenChinhSach { get; set; } = null!;
+    public string Ten_Chinh_Sach { get; set; } = null!;
 
-    public DateOnly TuNgay { get; set; }
+    public DateOnly Tu_Ngay { get; set; }
 
-    public DateOnly DenNgay { get; set; }
+    public DateOnly Den_Ngay { get; set; }
 
-    public double GiaTheoDem { get; set; }
+    public double Gia_Theo_Dem { get; set; }
 
-    public double GiaTheoGio { get; set; }
+    public double Gia_Theo_Gio { get; set; }
 
-    public virtual LoaiPhong MaLoaiPhongNavigation { get; set; } = null!;
+    //public virtual LoaiPhong MaLoaiPhongNavigation { get; set; } = null!;
 }

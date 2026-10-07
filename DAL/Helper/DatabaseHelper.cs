@@ -17,7 +17,7 @@ namespace DAL.Helper
         }
 
         // Dapper cần một IDbConnection để hoạt động
-        public IDbConnection CreateConnection()
+        public IDbConnection TConnection()
         {
             var connection = new SqlConnection(_connectionString);
             // Mở sẵn kết nối để các Repository có thể dùng ngay

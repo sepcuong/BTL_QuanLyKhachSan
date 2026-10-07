@@ -23,7 +23,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Query<User>(
                         "sp_User_GetAll",
@@ -40,7 +40,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Execute(
                         "sp_User_Create",
@@ -71,7 +71,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Execute(
                         "sp_User_Update",
@@ -101,7 +101,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Execute(
                         "sp_User_Delete",
@@ -119,7 +119,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.QueryFirstOrDefault<User>(
                         "sp_User_GetById",
@@ -137,7 +137,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Query<User>(
                         "sp_User_Search",

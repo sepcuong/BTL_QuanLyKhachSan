@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Model;
 
-namespace DAL
+namespace BLL.Interfaces
 {
-    public interface IPhongRepository
+    public partial interface IPhongBusiness
     {
         List<Phong> GetAllPhong();
         bool Create(Phong thongtin);

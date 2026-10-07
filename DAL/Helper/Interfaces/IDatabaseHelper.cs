@@ -8,6 +8,6 @@ namespace DAL.Helper.Interfaces
         /// <summary>
         /// Create and return an open DB connection.
         /// </summary>
-        IDbConnection CreateConnection();
+        IDbConnection TConnection();
     }
 }

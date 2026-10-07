@@ -21,7 +21,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Query<KhachHang>(
                         "sp_KhachHang_GetAll",
@@ -38,7 +38,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Execute(
                         "sp_KhachHang_Create",
@@ -64,7 +64,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Execute(
                         "sp_KhachHang_Update",
@@ -90,7 +90,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Execute(
                         "sp_KhachHang_Delete",
@@ -108,7 +108,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.QueryFirstOrDefault<KhachHang>(
                         "sp_KhachHang_GetById",
@@ -126,7 +126,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Query<KhachHang>(
                         "sp_KhachHang_Search",

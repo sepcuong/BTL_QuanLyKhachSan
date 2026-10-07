@@ -21,7 +21,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Query<LoaiPhong>(
                         "sp_LoaiPhong_GetAll",
@@ -38,7 +38,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Execute(
                         "sp_LoaiPhong_Create",
@@ -63,7 +63,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Execute(
                         "sp_LoaiPhong_Update",
@@ -88,7 +88,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Execute(
                         "sp_LoaiPhong_Delete",
@@ -106,7 +106,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.QueryFirstOrDefault<LoaiPhong>(
                         "sp_LoaiPhong_GetById",
@@ -124,7 +124,7 @@ namespace DAL
         {
             try
             {
-                using (var connection = _dbHelper.CreateConnection())
+                using (var connection = _dbHelper.TConnection())
                 {
                     return connection.Query<LoaiPhong>(
                         "sp_LoaiPhong_Search",

@@ -6,7 +6,7 @@ using Model;
 
 namespace API.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
@@ -115,6 +115,22 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = "Có lỗi xảy ra khi tìm kiếm người dùng!", error = ex.Message });
             }
+        }
+        [AllowAnonymous]
+        [Route("login")]
+        [HttpPost]
+        public IActionResult Login([FromBody] LoginRequest req)
+        {
+            var user = _userBusiness.Login(req.TaiKhoan, req.MatKhau);
+            if (user == null) return Unauthorized(new { message = "Tài khoản hoặc mật khẩu không đúng" });
+            // trả về user hoặc token tùy implementation
+            return Ok(new 
+            { 
+                User_Id = user.User_Id, 
+                Hoten = user.Hoten, 
+                TaiKhoan = user.Taikhoan, 
+                Token = user.Token 
+            });
         }
     }
 }

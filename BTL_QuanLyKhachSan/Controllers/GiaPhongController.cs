@@ -26,6 +26,7 @@ namespace API.Controllers
         {
             try
             {
+                thongtin.Ma_Gia = Guid.NewGuid().ToString(); // Tạo mã giá mới
                 var result = _giaPhongBusiness.Create(thongtin);
                 return Ok(thongtin);
             }

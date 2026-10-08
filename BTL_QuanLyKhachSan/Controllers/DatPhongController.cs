@@ -25,6 +25,7 @@ namespace API.Controllers
         {
             try
             {
+                thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
                 var result = _datPhongBusiness.Create(thongtin);
                 return Ok(thongtin);
             }

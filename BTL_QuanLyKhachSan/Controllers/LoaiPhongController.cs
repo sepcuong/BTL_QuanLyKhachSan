@@ -28,6 +28,7 @@ namespace API.Controllers
         {
             try
             {
+                thongtin.Ma_Loai_Phong = Guid.NewGuid().ToString();
                 var result = _loaiPhongBusiness.Create(thongtin);
                 return Ok(thongtin);
             }

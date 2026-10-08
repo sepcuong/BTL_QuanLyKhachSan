@@ -21,5 +21,5 @@ public partial class HoaDonKhachSan
 
     public string? PhuongThucThanhToan { get; set; }
 
-    public virtual DatPhong MaDatPhongNavigation { get; set; } = null!;
+    //public virtual DatPhong MaDatPhongNavigation { get; set; } = null!;
 }

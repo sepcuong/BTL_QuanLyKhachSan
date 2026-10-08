@@ -15,5 +15,6 @@ namespace BLL.Interfaces
         bool Delete(string user_Id);
         User GetUserById(string user_Id);
         List<User> Search(string keyword);
+        User Login(string taikhoan, string matkhauHashed);
     }
 }

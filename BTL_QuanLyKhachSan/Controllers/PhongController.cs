@@ -26,6 +26,7 @@ namespace API.Controllers
         {
             try
             {
+                thongtin.Ma_Phong = Guid.NewGuid().ToString(); // Tạo mã phòng mới
                 var result = _phongBusiness.Create(thongtin);
                 return Ok(thongtin);
             }

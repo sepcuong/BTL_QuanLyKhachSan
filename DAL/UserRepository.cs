@@ -17,7 +17,22 @@ namespace DAL
         {
             _dbHelper = dbHelper;
         }
-
+        public User Login(string taikhoan, string matkhauHashed)
+        {
+            try
+            {
+                using var connection = _dbHelper.TConnection();
+                return connection.QueryFirstOrDefault<User>(
+                    "sp_User_Login",
+                    new { Taikhoan = taikhoan, Matkhau = matkhauHashed },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi khi đăng nhập: {ex.Message}", ex);
+            }
+        }
         // Implement the correct interface method
         public List<User> GetAllUsers()
         {

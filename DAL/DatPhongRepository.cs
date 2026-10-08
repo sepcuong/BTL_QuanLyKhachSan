@@ -10,7 +10,7 @@ using System.Data;
 
 namespace DAL
 {
-    public partial class DatPhongRepository
+    public partial class DatPhongRepository : IDatPhongRepository
     {
         private readonly IDatabaseHelper _dbHelper;
         public DatPhongRepository(IDatabaseHelper dbHelper)

@@ -37,6 +37,8 @@ builder.Services.AddTransient<IPhongBusiness, PhongBusiness>();
 builder.Services.AddTransient<IPhongRepository, PhongRepository>();
 builder.Services.AddTransient<IGiaPhongBusiness, GiaPhongBusiness>();
 builder.Services.AddTransient<IGiaPhongRepository, GiaPhongRepository>();
+builder.Services.AddTransient<IDatPhongBusiness, DatPhongBusiness>();
+builder.Services.AddTransient<IDatPhongRepository, DatPhongRepository>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

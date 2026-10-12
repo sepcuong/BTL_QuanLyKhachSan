@@ -45,7 +45,7 @@ namespace API.Controllers
         {
             try
             {
-                var result = _phongBusiness.Create(thongtin);
+                var result = _phongBusiness.Update(thongtin);
                 return Ok(thongtin);
             }
             catch (Exception ex)
@@ -65,8 +65,13 @@ namespace API.Controllers
             {
                 string Phong_Id = "";
                 if (formData.Keys.Contains("Phong_Id") && !string.IsNullOrEmpty(Convert.ToString(formData["Phong_Id"]))) { Phong_Id = Convert.ToString(formData["Phong_Id"]); }
-                var result = _phongBusiness.Delete(Phong_Id);
-                return Ok(result);
+                bool result = _phongBusiness.Delete(Phong_Id);
+                if (result)
+                {
+                    return Ok(new { message = "Xóa phòng thành công!" });
+                }else {                     
+                    return NotFound(new { message = "Không tìm thấy phòng để xóa!" }); 
+                }
             }
             catch (Exception ex)
             {

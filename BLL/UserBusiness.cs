@@ -63,7 +63,8 @@ namespace BLL
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Hoten.ToString()),
-                    new Claim(ClaimTypes.StreetAddress, user.Diachi.ToString())
+                    new Claim(ClaimTypes.StreetAddress, user.Diachi.ToString()),
+                    new Claim(ClaimTypes.Role, user.Role.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

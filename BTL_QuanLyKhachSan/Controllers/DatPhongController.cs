@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BLL.Interfaces;
 using Model;
+using System;
 
 namespace API.Controllers
 {
@@ -26,6 +27,7 @@ namespace API.Controllers
             try
             {
                 thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
+                thongtin.Ngay_Dat = DateTime.Now;
                 var result = _datPhongBusiness.Create(thongtin);
                 return Ok(thongtin);
             }
@@ -58,11 +60,20 @@ namespace API.Controllers
         }
         [Route("delete-dat-phong")]
         [HttpPost]
-        public IActionResult DeleteDatPhong([FromBody] string maDatPhong)
+        public IActionResult DeleteDatPhong([FromBody] Dictionary<string, object> formData)
         {
             try
             {
-                var result = _datPhongBusiness.Delete(maDatPhong);
+                string maDatPhong_Id = "";
+                if (formData.ContainsKey("maDatPhong_Id") && formData["maDatPhong_Id"] != null)
+                {
+                    maDatPhong_Id = formData["maDatPhong_Id"].ToString();
+                }
+                else
+                {
+                    return BadRequest(new { message = "Mã đặt phòng không được để trống" });
+                }
+                var result = _datPhongBusiness.Delete(maDatPhong_Id);
                 return Ok(new { message = "Xóa thành công" });
             }
             catch (Exception ex)
@@ -72,11 +83,20 @@ namespace API.Controllers
         }
         [Route("cancel-dat-phong")]
         [HttpPost]
-        public IActionResult CancelDatPhong([FromBody] string maDatPhong)
+        public IActionResult CancelDatPhong([FromBody] Dictionary<string, object> formData)
         {
             try
             {
-                var result = _datPhongBusiness.Cancel(maDatPhong);
+                string maDatPhong_Id = "";
+                if (formData.ContainsKey("maDatPhong_Id") && formData["maDatPhong_Id"] != null)
+                {
+                    maDatPhong_Id = formData["maDatPhong_Id"].ToString();
+                }
+                else
+                {
+                    return BadRequest(new { message = "Mã đặt phòng không được để trống" });
+                }
+                var result = _datPhongBusiness.Cancel(maDatPhong_Id);
                 return Ok(new { message = "Hủy thành công" });
             }
             catch (Exception ex)
@@ -86,11 +106,20 @@ namespace API.Controllers
         }
         [Route("checkin-dat-phong")]
         [HttpPost]
-        public IActionResult CheckInDatPhong([FromBody] string maDatPhong)
+        public IActionResult CheckInDatPhong([FromBody] Dictionary<string, object> formData)
         {
             try
             {
-                var result = _datPhongBusiness.CheckIn(maDatPhong);
+                string maDatPhong_Id = "";
+                if (formData.ContainsKey("maDatPhong_Id") && formData["maDatPhong_Id"] != null)
+                {
+                    maDatPhong_Id = formData["maDatPhong_Id"].ToString();
+                }
+                else
+                {
+                    return BadRequest(new { message = "Mã đặt phòng không được để trống" });
+                }
+                var result = _datPhongBusiness.CheckIn(maDatPhong_Id);
                 return Ok(new { message = "Check-in thành công" });
             }
             catch (Exception ex)
@@ -100,11 +129,20 @@ namespace API.Controllers
         }
         [Route("checkout-dat-phong")]
         [HttpPost]
-        public IActionResult CheckOutDatPhong([FromBody] string maDatPhong)
+        public IActionResult CheckOutDatPhong([FromBody] Dictionary<string, object> formData)
         {
             try
             {
-                var result = _datPhongBusiness.CheckOut(maDatPhong);
+                string maDatPhong_Id = "";
+                if (formData.ContainsKey("maDatPhong_Id") && formData["maDatPhong_Id"] != null)
+                {
+                    maDatPhong_Id = formData["maDatPhong_Id"].ToString();
+                }
+                else
+                {
+                    return BadRequest(new { message = "Mã đặt phòng không được để trống" });
+                }
+                var result = _datPhongBusiness.CheckOut(maDatPhong_Id);
                 return Ok(new { message = "Check-out thành công" });
             }
             catch (Exception ex)

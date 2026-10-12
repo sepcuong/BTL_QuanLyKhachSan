@@ -152,8 +152,8 @@ namespace DAL
                         "sp_GiaPhong_GetCurrent",
                         new
                         {
-                            MaLoaiPhong = maLoaiPhong,
-                            Ngay = ngay.Date
+                            Ma_Loai_Phong = maLoaiPhong,
+                            Ngay = ngay
                         },
                         commandType: CommandType.StoredProcedure
                     ).ToList();

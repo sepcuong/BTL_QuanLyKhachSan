@@ -5,19 +5,19 @@ namespace Model;
 
 public partial class ChiTietSuDungDv
 {
-    public string MaChiTietDv { get; set; } = null!;
+    public string Ma_Chi_Tiet_Dv { get; set; } = null!;
 
-    public string MaDatPhong { get; set; } = null!;
+    public string Ma_Dat_Phong { get; set; } = null!;
 
-    public string MaDichVu { get; set; } = null!;
+    public string Ma_Dich_Vu { get; set; } = null!;
 
-    public int SoLuong { get; set; }
+    public int So_Luong { get; set; }
 
-    public double ThanhTien { get; set; }
+    public double Thanh_Tien { get; set; }
 
-    public DateTime? NgaySuDung { get; set; }
+    public DateTime? Ngay_Su_Dung { get; set; }
 
-    public virtual DatPhong MaDatPhongNavigation { get; set; } = null!;
+    //public virtual DatPhong MaDatPhongNavigation { get; set; } = null!;
 
-    public virtual DichVu MaDichVuNavigation { get; set; } = null!;
+    //public virtual DichVu MaDichVuNavigation { get; set; } = null!;
 }

@@ -5,13 +5,13 @@ namespace Model;
 
 public partial class DichVu
 {
-    public string MaDichVu { get; set; } = null!;
+    public string Ma_Dich_Vu { get; set; } = null!;
 
-    public string TenDichVu { get; set; } = null!;
+    public string Ten_Dich_Vu { get; set; } = null!;
 
-    public double DonGia { get; set; }
+    public double Don_Gia { get; set; }
 
-    public string? DonViTinh { get; set; }
+    public string? Don_Vi_Tinh { get; set; }
 
-    public virtual ICollection<ChiTietSuDungDv> ChiTietSuDungDvs { get; set; } = new List<ChiTietSuDungDv>();
+    //public virtual ICollection<ChiTietSuDungDv> ChiTietSuDungDvs { get; set; } = new List<ChiTietSuDungDv>();
 }

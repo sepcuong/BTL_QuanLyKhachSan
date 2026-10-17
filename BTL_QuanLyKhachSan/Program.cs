@@ -45,6 +45,10 @@ builder.Services.AddTransient<IGiaPhongBusiness, GiaPhongBusiness>();
 builder.Services.AddTransient<IGiaPhongRepository, GiaPhongRepository>();
 builder.Services.AddTransient<IDatPhongBusiness, DatPhongBusiness>();
 builder.Services.AddTransient<IDatPhongRepository, DatPhongRepository>();
+builder.Services.AddTransient<IChiTietDvBusiness, ChiTietDvBusiness>();
+builder.Services.AddTransient<IChiTietDvRepository, ChiTietDvRepository>();
+builder.Services.AddTransient<IHoaDonBusiness, HoaDonBusiness>();
+builder.Services.AddTransient<IHoaDonRepository, HoaDonRepository>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -70,13 +74,14 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
-
+// app.UseApiMiddleware();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 

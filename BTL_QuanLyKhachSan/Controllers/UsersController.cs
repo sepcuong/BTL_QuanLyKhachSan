@@ -6,9 +6,9 @@ using Model;
 
 namespace API.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api-admin/[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly IUserBusiness _userBusiness;

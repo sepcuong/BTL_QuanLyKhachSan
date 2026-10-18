@@ -6,7 +6,7 @@ using Model;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api-admin/[controller]")]
     public class LoaiPhongController : ControllerBase
     {
         private readonly ILoaiPhongBusiness _loaiPhongBusiness;

@@ -1,15 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37111.16 d17.14
+VisualStudioVersion = 17.14.37111.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "BTL_QuanLyKhachSan\API.csproj", "{B20B18A2-D38A-47B6-83B9-651D09AE2A24}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIAdmin", "BTL_QuanLyKhachSan\APIAdmin.csproj", "{B20B18A2-D38A-47B6-83B9-651D09AE2A24}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLL", "BLL\BLL.csproj", "{B44AF72D-44F6-4325-B13D-240516E69D43}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{7994D9A3-02DD-4978-988A-D10BBAAE2C1C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{F2550431-DD8C-4BB3-ACDB-95CE88A271D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIUser", "APIUser\APIUser.csproj", "{29732F3B-89E3-4F04-9A44-DAE0B494B527}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gateway", "Gateway\Gateway.csproj", "{E118F293-C488-4EED-B79F-D7D0F1DDB78F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{F2550431-DD8C-4BB3-ACDB-95CE88A271D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2550431-DD8C-4BB3-ACDB-95CE88A271D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2550431-DD8C-4BB3-ACDB-95CE88A271D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29732F3B-89E3-4F04-9A44-DAE0B494B527}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29732F3B-89E3-4F04-9A44-DAE0B494B527}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29732F3B-89E3-4F04-9A44-DAE0B494B527}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29732F3B-89E3-4F04-9A44-DAE0B494B527}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E118F293-C488-4EED-B79F-D7D0F1DDB78F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E118F293-C488-4EED-B79F-D7D0F1DDB78F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E118F293-C488-4EED-B79F-D7D0F1DDB78F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E118F293-C488-4EED-B79F-D7D0F1DDB78F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

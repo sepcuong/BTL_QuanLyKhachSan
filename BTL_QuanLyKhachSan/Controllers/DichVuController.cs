@@ -5,7 +5,7 @@ using Model;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api-admin/[controller]")]
     public class DichVuController : ControllerBase
     {
         private readonly IDichVuBusiness _dichvubusiness;

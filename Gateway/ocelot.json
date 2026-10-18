@@ -1,6 +1,5 @@
 ﻿{
   "Routes": [
-    // 1. LUỒNG DÀNH CHO NGƯỜI DÙNG (PUBLIC / CUSTOMER)
     {
       "DownstreamPathTemplate": "/api/{everything}",
       "DownstreamScheme": "http",
@@ -11,10 +10,8 @@
         }
       ],
       "UpstreamPathTemplate": "/api-user/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST"]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ]
     },
-
-    // 2. LUỒNG DÀNH CHO ADMIN (YÊU CẦU XÁC THỰC JWT)
     {
       "DownstreamPathTemplate": "/api/{everything}",
       "DownstreamScheme": "http",
@@ -25,11 +22,7 @@
         }
       ],
       "UpstreamPathTemplate": "/api-admin/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST"],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     }
   ],
   "GlobalConfiguration": {

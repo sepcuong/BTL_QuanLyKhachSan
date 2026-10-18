@@ -9,6 +9,7 @@ namespace API.Controllers
     //[Authorize]
     [ApiController]
     [Route("api-admin/[controller]")]
+    [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly IUserBusiness _userBusiness;

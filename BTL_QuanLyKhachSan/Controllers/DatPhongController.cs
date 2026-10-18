@@ -7,6 +7,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api-admin/[controller]")]
+    [Route("api/[controller]")]
     public class DatPhongController : ControllerBase
     {
         private readonly IDatPhongBusiness _datPhongBusiness;

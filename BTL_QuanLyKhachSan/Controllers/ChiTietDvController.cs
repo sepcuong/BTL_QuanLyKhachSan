@@ -6,6 +6,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api-admin/[controller]")]
+    [Route("api/[controller]")]
     public class ChiTietDvController : ControllerBase
     {
         private readonly IChiTietDvBusiness _business;

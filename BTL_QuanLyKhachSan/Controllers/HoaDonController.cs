@@ -6,6 +6,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api-admin/[controller]")]
+    [Route("api/[controller]")]
     public class HoaDonController : ControllerBase
     {
         private readonly IHoaDonBusiness _business;

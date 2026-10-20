@@ -1,32 +1,18 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
 
-# Depending on the operating system of the host machines(s) that will build or run the containers, the image specified in the FROM statement may need to be changed.
-# For more information, please see https://aka.ms/containercompat
+COPY ["BTL_QuanLyKhachSan/APIAdmin.csproj", "BTL_QuanLyKhachSan/"]
+COPY ["BLL/BLL.csproj", "BLL/"]
+COPY ["DAL/DAL.csproj", "DAL/"]
+COPY ["Model/Model.csproj", "Model/"]
+RUN dotnet restore "BTL_QuanLyKhachSan/APIAdmin.csproj"
 
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-nanoserver-1809 AS base
+COPY . .
+RUN dotnet publish "BTL_QuanLyKhachSan/APIAdmin.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
-
-
-# This stage is used to build the service project
-FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["BTL_QuanLyKhachSan/BTL_QuanLyKhachSan.csproj", "BTL_QuanLyKhachSan/"]
-RUN dotnet restore "./BTL_QuanLyKhachSan/BTL_QuanLyKhachSan.csproj"
-COPY . .
-WORKDIR "/src/BTL_QuanLyKhachSan"
-RUN dotnet build "./BTL_QuanLyKhachSan.csproj" -c %BUILD_CONFIGURATION% -o /app/build
-
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./BTL_QuanLyKhachSan.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
-
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "BTL_QuanLyKhachSan.dll"]
+ENV ASPNETCORE_HTTP_PORTS=8080
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "APIAdmin.dll"]

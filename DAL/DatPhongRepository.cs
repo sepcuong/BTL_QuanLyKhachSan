@@ -226,7 +226,7 @@ namespace DAL
                 {
                     return connection.QueryFirstOrDefault<DatPhong>(
                         "sp_DatPhong_GetByPhong",
-                        new { Ma_Khach_Hang = maPhong },
+                        new { Ma_Phong = maPhong },
                         commandType: CommandType.StoredProcedure
                     );
                 }

@@ -18,9 +18,13 @@ namespace BLL
     {
         private IUserRepository _res;
         private string Secret;
+        private string Issuer;
+        private string Audience;
         public UserBusiness(IUserRepository res, IConfiguration configuration)
         {
             Secret = configuration["AppSettings:Secret"];
+            Issuer = configuration["AppSettings:Issuer"] ?? "BTL_QuanLyKhachSan";
+            Audience = configuration["AppSettings:Audience"] ?? "BTL_QuanLyKhachSan.Client";
             _res = res;
         }
         public List<User> GetAllUsers()
@@ -60,6 +64,8 @@ namespace BLL
             var key = Encoding.ASCII.GetBytes(Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
+                Issuer = Issuer,
+                Audience = Audience,
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Hoten.ToString()),

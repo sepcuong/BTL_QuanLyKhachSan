@@ -4,7 +4,9 @@ using Ocelot.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 
 // Nạp cấu hình từ ocelot.json
-builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+builder.Configuration
+    .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 builder.Services.AddCors(options =>
 {

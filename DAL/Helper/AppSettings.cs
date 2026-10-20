@@ -8,6 +8,8 @@ namespace DAL.Helper
 {
     public class AppSettings
     {
-        public string Secret { get; set; }
+        public string Secret { get; set; } = string.Empty;
+        public string Issuer { get; set; } = "BTL_QuanLyKhachSan";
+        public string Audience { get; set; } = "BTL_QuanLyKhachSan.Client";
     }
 }

@@ -25,7 +25,7 @@ namespace APIUser.Controllers
                 thongtin.User_Id = Guid.NewGuid().ToString();
                 //thongtin.Matkhau = 
                 var isCreate = _userBusiness.Create(thongtin);
-                return Ok(thongtin);
+                return Ok(UserResponse.From(thongtin));
                 //return thongtin;
             }
             catch (Exception ex)

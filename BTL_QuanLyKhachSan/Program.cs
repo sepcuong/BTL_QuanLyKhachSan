@@ -3,6 +3,7 @@ using BLL.Interfaces;
 using DAL;
 using DAL.Helper;
 using DAL.Helper.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -23,6 +24,10 @@ Log.Logger = new LoggerConfiguration()
 var appSettingsSection = builder.Configuration.GetSection("AppSettings");
 builder.Services.Configure<AppSettings>(appSettingsSection);
 var appSettings = appSettingsSection.Get<AppSettings>() ?? throw new InvalidOperationException("Chưa cấu hình AppSettings.");
+if (string.IsNullOrWhiteSpace(appSettings.Secret) || Encoding.UTF8.GetByteCount(appSettings.Secret) < 32)
+{
+    throw new InvalidOperationException("AppSettings:Secret phải được cấu hình với ít nhất 32 byte.");
+}
 var key = Encoding.UTF8.GetBytes(appSettings.Secret);
 
 builder.Host.UseSerilog();
@@ -65,12 +70,21 @@ builder.Services.AddAuthentication(options =>
     options.RequireHttpsMetadata = false;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false,   // Set true nếu muốn kiểm tra Issuer
-        ValidateAudience = false, // Set true nếu muốn kiểm tra Audience
-        ValidateLifetime = true,  // Kiểm tra token hết hạn chưa
+        ValidateIssuer = true,
+        ValidIssuer = appSettings.Issuer,
+        ValidateAudience = true,
+        ValidAudience = appSettings.Audience,
+        ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireRole("Admin")
+        .Build();
 });
 
 var app = builder.Build();

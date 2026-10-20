@@ -21,9 +21,9 @@ namespace API.Controllers
 
         [Route("get-all-users")]
         [HttpGet]
-        public List<User> GetAll()
+        public List<UserResponse> GetAll()
         {
-            return _userBusiness.GetAllUsers();
+            return _userBusiness.GetAllUsers().Select(UserResponse.From).ToList();
         }
 
         [Route("create-user")]
@@ -35,7 +35,7 @@ namespace API.Controllers
                 thongtin.User_Id = Guid.NewGuid().ToString();
                 //thongtin.Matkhau = 
                 var isCreate = _userBusiness.Create(thongtin);
-                return Ok(thongtin);
+                return Ok(UserResponse.From(thongtin));
                 //return thongtin;
             } catch (Exception ex)
             {
@@ -48,12 +48,12 @@ namespace API.Controllers
         }
         [Route("update-user")]
         [HttpPost]
-        public User UpdateUser([FromBody] User thongtin)
+        public IActionResult UpdateUser([FromBody] User thongtin)
         {
             try
             {
-                _userBusiness.Update(thongtin);
-                return thongtin;
+                var result = _userBusiness.Update(thongtin);
+                return Ok(thongtin);
             } catch (Exception ex)
             {
                 throw new Exception("Có lỗi xảy ra khi cập nhật người dùng: " + ex.Message);
@@ -91,7 +91,7 @@ namespace API.Controllers
                 var user = _userBusiness.GetUserById(user_Id);
                 if (user != null)
                 {
-                    return Ok(user);
+                    return Ok(UserResponse.From(user));
                 }
                 else
                 {
@@ -110,7 +110,7 @@ namespace API.Controllers
             try
             {
                 var users = _userBusiness.Search(keyword);
-                return Ok(users);
+                return Ok(users.Select(UserResponse.From));
             }
             catch (Exception ex)
             {

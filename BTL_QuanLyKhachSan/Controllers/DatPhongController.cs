@@ -30,11 +30,15 @@ namespace API.Controllers
                 thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
                 thongtin.Ngay_Dat = DateTime.Now;
                 var result = _datPhongBusiness.Create(thongtin);
+                if (!result)
+                {
+                    return BadRequest(new { message = "Tạo đặt phòng thất bại." });
+                }
                 return Ok(thongtin);
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("đã tồn tại"))
+                if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không thể") || ex.Message.Contains("không được"))
                 {
                     return BadRequest(new { message = ex.Message });
                 }
@@ -48,11 +52,15 @@ namespace API.Controllers
             try
             {
                 var result = _datPhongBusiness.Update(thongtin);
+                if (!result)
+                {
+                    return NotFound(new { message = "Cập nhật đặt phòng thất bại." });
+                }
                 return Ok(thongtin);
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("đã tồn tại"))
+                if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không thể") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
                 {
                     return BadRequest(new { message = ex.Message });
                 }
@@ -75,10 +83,18 @@ namespace API.Controllers
                     return BadRequest(new { message = "Mã đặt phòng không được để trống" });
                 }
                 var result = _datPhongBusiness.Delete(maDatPhong_Id);
+                if (!result)
+                {
+                    return NotFound(new { message = "Không tìm thấy đặt phòng để xóa." });
+                }
                 return Ok(new { message = "Xóa thành công" });
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("không được"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }
@@ -98,10 +114,18 @@ namespace API.Controllers
                     return BadRequest(new { message = "Mã đặt phòng không được để trống" });
                 }
                 var result = _datPhongBusiness.Cancel(maDatPhong_Id);
+                if (!result)
+                {
+                    return NotFound(new { message = "Hủy đặt phòng thất bại." });
+                }
                 return Ok(new { message = "Hủy thành công" });
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("không thể") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }
@@ -121,10 +145,18 @@ namespace API.Controllers
                     return BadRequest(new { message = "Mã đặt phòng không được để trống" });
                 }
                 var result = _datPhongBusiness.CheckIn(maDatPhong_Id);
+                if (!result)
+                {
+                    return NotFound(new { message = "Check-in thất bại." });
+                }
                 return Ok(new { message = "Check-in thành công" });
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("không thể") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }
@@ -144,10 +176,18 @@ namespace API.Controllers
                     return BadRequest(new { message = "Mã đặt phòng không được để trống" });
                 }
                 var result = _datPhongBusiness.CheckOut(maDatPhong_Id);
+                if (!result)
+                {
+                    return NotFound(new { message = "Check-out thất bại." });
+                }
                 return Ok(new { message = "Check-out thành công" });
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("không thể") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }

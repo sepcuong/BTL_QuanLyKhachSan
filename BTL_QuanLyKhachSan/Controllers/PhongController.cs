@@ -29,11 +29,15 @@ namespace API.Controllers
             {
                 thongtin.Ma_Phong = Guid.NewGuid().ToString(); // Tạo mã phòng mới
                 var result = _phongBusiness.Create(thongtin);
+                if (!result)
+                {
+                    return BadRequest(new { message = "Tạo phòng thất bại." });
+                }
                 return Ok(thongtin);
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("đã tồn tại"))
+                if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không được"))
                 {
                     return BadRequest(new { message = ex.Message });
                 }
@@ -47,11 +51,15 @@ namespace API.Controllers
             try
             {
                 var result = _phongBusiness.Update(thongtin);
+                if (!result)
+                {
+                    return NotFound(new { message = "Cập nhật phòng thất bại." });
+                }
                 return Ok(thongtin);
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("đã tồn tại"))
+                if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
                 {
                     return BadRequest(new { message = ex.Message });
                 }
@@ -125,11 +133,21 @@ namespace API.Controllers
                 string trangThai = "";
                 if (formData.Keys.Contains("maPhong") && !string.IsNullOrEmpty(Convert.ToString(formData["maPhong"]))) { maPhong = Convert.ToString(formData["maPhong"]); }
                 if (formData.Keys.Contains("trangThai") && !string.IsNullOrEmpty(Convert.ToString(formData["trangThai"]))) { trangThai = Convert.ToString(formData["trangThai"]); }
+
+                if (string.IsNullOrWhiteSpace(maPhong) || string.IsNullOrWhiteSpace(trangThai))
+                {
+                    return BadRequest(new { message = "Mã phòng và trạng thái không được để trống." });
+                }
+
                 var result = _phongBusiness.Update_TrangThai(maPhong, trangThai);
                 return Ok(result);
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }
@@ -140,10 +158,18 @@ namespace API.Controllers
             try
             {
                 var result = _phongBusiness.GetAvailable(ngaynhan, ngaytra);
+                if (result == null)
+                {
+                    return NotFound(new { message = "Không có phòng trống trong khoảng thời gian đã chọn." });
+                }
                 return Ok(result);
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("Ngày nhận"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }

@@ -56,10 +56,18 @@ namespace API.Controllers
             {
                 thongtin.Ma_Hoa_Don = Guid.NewGuid().ToString();
                 var result = _business.Create(thongtin);
+                if (!result)
+                {
+                    return BadRequest(new { message = "Tạo hóa đơn thất bại." });
+                }
                 return Ok(result);
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy") || ex.Message.Contains("đã có"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }
@@ -71,10 +79,18 @@ namespace API.Controllers
             try
             {
                 var result = _business.Update(thongtin);
+                if (!result)
+                {
+                    return NotFound(new { message = "Cập nhật hóa đơn thất bại." });
+                }
                 return Ok(result);
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy") || ex.Message.Contains("đã"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }
@@ -90,6 +106,11 @@ namespace API.Controllers
                 {
                     maHoaDon_Id = Convert.ToString(formData["maHoaDon_Id"]);
                 }
+                else
+                {
+                    return BadRequest(new { message = "Mã hóa đơn không được để trống." });
+                }
+
                 var isDelete = _business.Delete(maHoaDon_Id);
                 if (isDelete)
                 {
@@ -102,6 +123,10 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("không được"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }

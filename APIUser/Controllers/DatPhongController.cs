@@ -22,11 +22,15 @@ namespace APIUser.Controllers
                 thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
                 thongtin.Ngay_Dat = DateTime.Now;
                 var result = _datPhongBusiness.Create(thongtin);
+                if (!result)
+                {
+                    return BadRequest(new { message = "Tạo đặt phòng thất bại." });
+                }
                 return Ok(thongtin);
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("đã tồn tại"))
+                if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không thể") || ex.Message.Contains("không được"))
                 {
                     return BadRequest(new { message = ex.Message });
                 }
@@ -40,11 +44,15 @@ namespace APIUser.Controllers
             try
             {
                 var result = _datPhongBusiness.Update(thongtin);
+                if (!result)
+                {
+                    return NotFound(new { message = "Cập nhật đặt phòng thất bại." });
+                }
                 return Ok(thongtin);
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("đã tồn tại"))
+                if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không thể") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
                 {
                     return BadRequest(new { message = ex.Message });
                 }

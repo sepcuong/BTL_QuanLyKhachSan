@@ -48,12 +48,12 @@ namespace API.Controllers
         }
         [Route("update-user")]
         [HttpPost]
-        public User UpdateUser([FromBody] User thongtin)
+        public IActionResult UpdateUser([FromBody] User thongtin)
         {
             try
             {
                 _userBusiness.Update(thongtin);
-                return thongtin;
+                return Ok(thongtin);
             } catch (Exception ex)
             {
                 throw new Exception("Có lỗi xảy ra khi cập nhật người dùng: " + ex.Message);

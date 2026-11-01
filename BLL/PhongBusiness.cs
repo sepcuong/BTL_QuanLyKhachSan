@@ -13,14 +13,16 @@ namespace BLL
     public class PhongBusiness: IPhongBusiness
     {
         private IPhongRepository _res;
-        public PhongBusiness(IPhongRepository res, IConfiguration configuration)
+        private readonly IDatPhongRepository _datPhongRepository;
+        public PhongBusiness(IPhongRepository res, IDatPhongRepository datPhongRepository, IConfiguration configuration)
         {
             _res = res;
+            _datPhongRepository = datPhongRepository;
         }
 
         public List<Phong> GetAllPhong()
         {
-            return _res.GetAllPhong();
+            return ApplyBookingStatuses(_res.GetAllPhong());
         }
         public bool Create(Phong thongtin)
         {
@@ -59,11 +61,12 @@ namespace BLL
         }
         public Phong GetPhongById(string maPhong)
         {
-            return _res.GetPhongById(maPhong);
+            var room = _res.GetPhongById(maPhong);
+            return room == null ? null : ApplyBookingStatuses(new List<Phong> { room })[0];
         }
         public List<Phong> Search(string keyword)
         {
-            return _res.Search(keyword);
+            return ApplyBookingStatuses(_res.Search(keyword));
         }
         public Phong Update_TrangThai(string maPhong, string trangThai)
         {
@@ -85,6 +88,57 @@ namespace BLL
                 throw new Exception("Ngày nhận phải nhỏ hơn ngày trả.");
 
             return _res.GetAvailable(ngayNhan, ngayTra);
+        }
+
+        private List<Phong> ApplyBookingStatuses(List<Phong> rooms)
+        {
+            var bookings = _datPhongRepository.GetAllDatPhong();
+            var now = DateTime.Now;
+
+            foreach (var room in rooms)
+            {
+                var roomBookings = bookings.Where(booking =>
+                    booking.Ma_Phong == room.Ma_Phong &&
+                    !IsCancelledOrCheckedOut(booking.Trang_Thai) &&
+                    (IsCheckedIn(booking.Trang_Thai) || booking.Ngay_Tra_Du_Kien > now)).ToList();
+
+                if (roomBookings.Any(booking => IsCheckedIn(booking.Trang_Thai)))
+                {
+                    room.Trang_Thai = "Đang ở";
+                }
+                else if (roomBookings.Count > 0)
+                {
+                    room.Trang_Thai = "Đã đặt";
+                }
+                else if (IsBookingStatus(room.Trang_Thai))
+                {
+                    room.Trang_Thai = "Trống";
+                }
+            }
+
+            return rooms;
+        }
+
+        private static bool IsCancelledOrCheckedOut(string? status)
+        {
+            var value = (status ?? string.Empty).Trim().ToLowerInvariant();
+            return value.Contains("hủy") || value.Contains("huy") || value.Contains("cancel") ||
+                   value.Contains("trả") || value.Contains("tra") || value.Contains("checkout") ||
+                   value.Contains("check-out") || value.Contains("checkedout");
+        }
+
+        private static bool IsCheckedIn(string? status)
+        {
+            var value = (status ?? string.Empty).Trim().ToLowerInvariant();
+            return value.Contains("đang ở") || value.Contains("dang o") || value.Contains("checkin") ||
+                   value.Contains("check-in") || value.Contains("checkedin") || value.Contains("checked-in");
+        }
+
+        private static bool IsBookingStatus(string? status)
+        {
+            var value = (status ?? string.Empty).Trim().ToLowerInvariant();
+            return value is "trống" or "trong" or "đã đặt" or "da dat" or "đang ở" or "dang o" or
+                "booked" or "reserved" or "occupied";
         }
     }
 }

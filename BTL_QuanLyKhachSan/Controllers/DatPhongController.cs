@@ -15,6 +15,18 @@ namespace API.Controllers
         {
             _datPhongBusiness = datPhongBusiness;
         }
+
+        private static string GetFormValue(Dictionary<string, object> formData, params string[] keys)
+        {
+            foreach (var key in keys)
+            {
+                var item = formData.FirstOrDefault(x => string.Equals(x.Key, key, StringComparison.OrdinalIgnoreCase));
+                if (item.Value != null)
+                    return item.Value.ToString() ?? string.Empty;
+            }
+
+            return string.Empty;
+        }
         [Route("get-all-dat-phong")]
         [HttpGet]
         public List<DatPhong> GetAllDatPhong()
@@ -27,7 +39,8 @@ namespace API.Controllers
         {
             try
             {
-                thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
+                if (string.IsNullOrWhiteSpace(thongtin.Ma_Dat_Phong))
+                    thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
                 thongtin.Ngay_Dat = DateTime.Now;
                 var result = _datPhongBusiness.Create(thongtin);
                 if (!result)
@@ -73,12 +86,8 @@ namespace API.Controllers
         {
             try
             {
-                string maDatPhong_Id = "";
-                if (formData.ContainsKey("maDatPhong_Id") && formData["maDatPhong_Id"] != null)
-                {
-                    maDatPhong_Id = formData["maDatPhong_Id"].ToString();
-                }
-                else
+                string maDatPhong_Id = GetFormValue(formData, "maDatPhong_Id", "maDatPhongId", "Ma_Dat_Phong", "id");
+                if (string.IsNullOrWhiteSpace(maDatPhong_Id))
                 {
                     return BadRequest(new { message = "Mã đặt phòng không được để trống" });
                 }
@@ -104,12 +113,8 @@ namespace API.Controllers
         {
             try
             {
-                string maDatPhong_Id = "";
-                if (formData.ContainsKey("maDatPhong_Id") && formData["maDatPhong_Id"] != null)
-                {
-                    maDatPhong_Id = formData["maDatPhong_Id"].ToString();
-                }
-                else
+                string maDatPhong_Id = GetFormValue(formData, "maDatPhong_Id", "maDatPhongId", "Ma_Dat_Phong", "id");
+                if (string.IsNullOrWhiteSpace(maDatPhong_Id))
                 {
                     return BadRequest(new { message = "Mã đặt phòng không được để trống" });
                 }
@@ -135,12 +140,8 @@ namespace API.Controllers
         {
             try
             {
-                string maDatPhong_Id = "";
-                if (formData.ContainsKey("maDatPhong_Id") && formData["maDatPhong_Id"] != null)
-                {
-                    maDatPhong_Id = formData["maDatPhong_Id"].ToString();
-                }
-                else
+                string maDatPhong_Id = GetFormValue(formData, "maDatPhong_Id", "maDatPhongId", "Ma_Dat_Phong", "id");
+                if (string.IsNullOrWhiteSpace(maDatPhong_Id))
                 {
                     return BadRequest(new { message = "Mã đặt phòng không được để trống" });
                 }
@@ -166,12 +167,8 @@ namespace API.Controllers
         {
             try
             {
-                string maDatPhong_Id = "";
-                if (formData.ContainsKey("maDatPhong_Id") && formData["maDatPhong_Id"] != null)
-                {
-                    maDatPhong_Id = formData["maDatPhong_Id"].ToString();
-                }
-                else
+                string maDatPhong_Id = GetFormValue(formData, "maDatPhong_Id", "maDatPhongId", "Ma_Dat_Phong", "id");
+                if (string.IsNullOrWhiteSpace(maDatPhong_Id))
                 {
                     return BadRequest(new { message = "Mã đặt phòng không được để trống" });
                 }
@@ -222,10 +219,6 @@ namespace API.Controllers
             try
             {
                 var result = _datPhongBusiness.GetByKhachHang(khachHang_Id);
-                if (result == null)
-                {
-                    return NotFound(new { message = $"Không tìm thấy đặt phòng cho khách hàng với mã: {khachHang_Id}" });
-                }
                 return Ok(result);
             }
             catch (Exception ex)

@@ -18,7 +18,7 @@ namespace DAL
         bool CheckOut(string maDatPhong);
         List<DatPhong> Search(string keyword);
         DatPhong GetById(string maDatPhong);
-        DatPhong GetByKhachHang(string maKhachHang);
+        List<DatPhong> GetByKhachHang(string maKhachHang);
         DatPhong GetByPhong(string maPhong);
     }
 }

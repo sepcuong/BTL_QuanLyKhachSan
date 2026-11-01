@@ -14,6 +14,18 @@ namespace API.Controllers
         {
             _phongBusiness = phongBusiness;
         }
+
+        private static string GetFormValue(Dictionary<string, object> formData, params string[] keys)
+        {
+            foreach (var key in keys)
+            {
+                var item = formData.FirstOrDefault(x => string.Equals(x.Key, key, StringComparison.OrdinalIgnoreCase));
+                if (item.Value != null)
+                    return item.Value.ToString() ?? string.Empty;
+            }
+
+            return string.Empty;
+        }
         [Route("get-all-phong")]
         [HttpGet]
         public IActionResult GetAllPhong()
@@ -72,8 +84,7 @@ namespace API.Controllers
         {
             try
             {
-                string Phong_Id = "";
-                if (formData.Keys.Contains("Phong_Id") && !string.IsNullOrEmpty(Convert.ToString(formData["Phong_Id"]))) { Phong_Id = Convert.ToString(formData["Phong_Id"]); }
+                string Phong_Id = GetFormValue(formData, "Phong_Id", "maPhong", "maPhong_Id", "id");
                 bool result = _phongBusiness.Delete(Phong_Id);
                 if (result)
                 {
@@ -129,10 +140,8 @@ namespace API.Controllers
         {
             try
             {
-                string maPhong = "";
-                string trangThai = "";
-                if (formData.Keys.Contains("maPhong") && !string.IsNullOrEmpty(Convert.ToString(formData["maPhong"]))) { maPhong = Convert.ToString(formData["maPhong"]); }
-                if (formData.Keys.Contains("trangThai") && !string.IsNullOrEmpty(Convert.ToString(formData["trangThai"]))) { trangThai = Convert.ToString(formData["trangThai"]); }
+                string maPhong = GetFormValue(formData, "maPhong", "maPhong_Id", "Ma_Phong", "Phong_Id", "id");
+                string trangThai = GetFormValue(formData, "trangThai", "Trang_Thai", "status");
 
                 if (string.IsNullOrWhiteSpace(maPhong) || string.IsNullOrWhiteSpace(trangThai))
                 {

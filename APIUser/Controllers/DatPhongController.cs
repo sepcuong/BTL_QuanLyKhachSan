@@ -19,7 +19,8 @@ namespace APIUser.Controllers
         {
             try
             {
-                thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
+                if (string.IsNullOrWhiteSpace(thongtin.Ma_Dat_Phong))
+                    thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
                 thongtin.Ngay_Dat = DateTime.Now;
                 var result = _datPhongBusiness.Create(thongtin);
                 if (!result)
@@ -66,10 +67,6 @@ namespace APIUser.Controllers
             try
             {
                 var result = _datPhongBusiness.GetByKhachHang(khachHang_Id);
-                if (result == null)
-                {
-                    return NotFound(new { message = $"Không tìm thấy đặt phòng cho khách hàng với mã: {khachHang_Id}" });
-                }
                 return Ok(result);
             }
             catch (Exception ex)

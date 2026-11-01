@@ -1,5 +1,6 @@
 ﻿using BLL;
 using BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using DAL;
 using DAL.Helper;
 using DAL.Helper.Interfaces;
@@ -43,6 +44,8 @@ builder.Services.AddTransient<IPhongBusiness, PhongBusiness>();
 builder.Services.AddTransient<IPhongRepository, PhongRepository>();
 builder.Services.AddTransient<IGiaPhongBusiness, GiaPhongBusiness>();
 builder.Services.AddTransient<IGiaPhongRepository, GiaPhongRepository>();
+builder.Services.AddTransient<IDichVuBusiness, DichVuBusiness>();
+builder.Services.AddTransient<IDichVuRepository, DichVuRepository>();
 builder.Services.AddTransient<IDatPhongBusiness, DatPhongBusiness>();
 builder.Services.AddTransient<IDatPhongRepository, DatPhongRepository>();
 builder.Services.AddTransient<IChiTietDvBusiness, ChiTietDvBusiness>();
@@ -50,6 +53,12 @@ builder.Services.AddTransient<IChiTietDvRepository, ChiTietDvRepository>();
 builder.Services.AddTransient<IHoaDonBusiness, HoaDonBusiness>();
 builder.Services.AddTransient<IHoaDonRepository, HoaDonRepository>();
 builder.Services.AddControllers();
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

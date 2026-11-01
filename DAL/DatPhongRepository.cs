@@ -40,7 +40,7 @@ namespace DAL
             {
                 using (var connection = _dbHelper.TConnection())
                 {
-                    return connection.Execute(
+                    connection.Execute(
                         "sp_DatPhong_Create",
                         new
                         {
@@ -55,7 +55,12 @@ namespace DAL
                             thongtin.Ghi_Chu
                         },
                         commandType: CommandType.StoredProcedure
-                    ) > 0;
+                    );
+                    return connection.QueryFirstOrDefault<DatPhong>(
+                        "sp_DatPhong_GetById",
+                        new { Ma_Dat_Phong = thongtin.Ma_Dat_Phong },
+                        commandType: CommandType.StoredProcedure
+                    ) != null;
                 }
             }
             catch (Exception ex)
@@ -134,11 +139,20 @@ namespace DAL
             {
                 using (var connection = _dbHelper.TConnection())
                 {
-                    return connection.Execute(
+                    connection.Execute(
                         "sp_DatPhong_CheckIn",
                         new { Ma_Dat_Phong = maDatPhong },
                         commandType: CommandType.StoredProcedure
-                    ) > 0;
+                    );
+                    var booking = connection.QueryFirstOrDefault<DatPhong>(
+                        "sp_DatPhong_GetById",
+                        new { Ma_Dat_Phong = maDatPhong },
+                        commandType: CommandType.StoredProcedure
+                    );
+                    var status = (booking?.Trang_Thai ?? string.Empty).Trim().ToLowerInvariant();
+                    return status.Contains("checkedin") || status.Contains("checked-in") ||
+                           status.Contains("check-in") || status.Contains("check in") ||
+                           status.Contains("đang ở") || status.Contains("dang o");
                 }
             }
             catch (Exception ex)
@@ -200,17 +214,17 @@ namespace DAL
                 throw new Exception($"Lỗi khi truy xuất DatPhong theo id: {ex.Message}", ex);
             }
         }
-        public DatPhong GetByKhachHang(string maKhachHang)
+        public List<DatPhong> GetByKhachHang(string maKhachHang)
         {
             try
             {
                 using (var connection = _dbHelper.TConnection())
                 {
-                    return connection.QueryFirstOrDefault<DatPhong>(
+                    return connection.Query<DatPhong>(
                         "sp_DatPhong_GetByKhachHang",
                         new { Ma_Khach_Hang = maKhachHang },
                         commandType: CommandType.StoredProcedure
-                    );
+                    ).ToList();
                 }
             }
             catch (Exception ex)

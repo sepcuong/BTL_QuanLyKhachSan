@@ -167,7 +167,7 @@ namespace BLL
                 throw new Exception("Không thể check-in cho đặt phòng đã hủy hoặc đã check-out.");
 
             if (IsCheckedInStatus(booking.Trang_Thai))
-                throw new Exception("Đặt phòng đã check-in.");
+                return true;
 
             return _res.CheckIn(maDatPhong);
         }
@@ -199,7 +199,7 @@ namespace BLL
         {
             return _res.GetById(maDatPhong);
         }
-        public DatPhong GetByKhachHang(string maKhachHang)
+        public List<DatPhong> GetByKhachHang(string maKhachHang)
         {
             return _res.GetByKhachHang(maKhachHang);
         }

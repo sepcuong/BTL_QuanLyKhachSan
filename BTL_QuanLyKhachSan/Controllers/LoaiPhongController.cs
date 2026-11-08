@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Model;
 
 
 namespace API.Controllers
 {
+    [Authorize(Roles = "Admin,LeTan")]
     [ApiController]
     [Route("api-admin/[controller]")]
     [Route("api/[controller]")]
@@ -31,15 +33,19 @@ namespace API.Controllers
             {
                 thongtin.Ma_Loai_Phong = Guid.NewGuid().ToString();
                 var result = _loaiPhongBusiness.Create(thongtin);
-                return Ok(thongtin);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Thêm loại phòng thành công."
+                });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("đã tồn tại"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Dữ liệu loại phòng đã tồn tại." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi hệ thống." });
             }
         }
         [Route("update-loaiphong")]
@@ -49,15 +55,19 @@ namespace API.Controllers
             try
             {
                 var result = _loaiPhongBusiness.Update(thongtin);
-                return Ok(result);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Cập nhật loại phòng thành công."
+                });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không tồn tại"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Không tìm thấy loại phòng để cập nhật." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi hệ thống." });
             }
         }
         [Route("delete-loaiphong")]
@@ -67,39 +77,43 @@ namespace API.Controllers
             try
             {
                 string loaiPhong_Id = "";
-                if (formData.Keys.Contains("loaiPhong_Id") && !string.IsNullOrEmpty(Convert.ToString(formData["loaiPhong_Id"]))) { loaiPhong_Id = Convert.ToString(formData["loaiPhong_Id"]); }
-                bool result = _loaiPhongBusiness.Delete(loaiPhong_Id);
-                if (result)
+                if (formData.Keys.Contains("loaiPhong_Id") && !string.IsNullOrWhiteSpace(Convert.ToString(formData["loaiPhong_Id"])))
                 {
-                    return Ok(new { message = "Xóa loại phòng thành công" });
+                    loaiPhong_Id = Convert.ToString(formData["loaiPhong_Id"]) ?? string.Empty;
                 }
                 else
                 {
-                    return BadRequest(new { message = "Xóa loại phòng thất bại" });
+                    return BadRequest(new { success = false, message = "Mã loại phòng không được để trống." });
+                }
+                bool result = _loaiPhongBusiness.Delete(loaiPhong_Id);
+                if (result)
+                {
+                    return Ok(new { success = true, message = "Xóa loại phòng thành công." });
+                }
+                else
+                {
+                    return NotFound(new { success = false, message = "Không tìm thấy loại phòng để xóa." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không tồn tại"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Không tìm thấy loại phòng để xóa." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi hệ thống." });
             }
         }
         [Route("get-by-id/{loaiPhong_Id}")]
         [HttpGet]
-        public LoaiPhong GetLoaiPhongById(string loaiPhong_Id)
+        public IActionResult GetLoaiPhongById(string loaiPhong_Id)
         {
-            try
+            var result = _loaiPhongBusiness.GetLoaiPhongById(loaiPhong_Id);
+            if (result == null)
             {
-                var result = _loaiPhongBusiness.GetLoaiPhongById(loaiPhong_Id);
-                return result;
+                return NotFound(new { success = false, message = "Không tìm thấy loại phòng." });
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Lỗi không thể lấy dữ liệu: " + ex.Message);
-            }
+            return Ok(result);
         }
         [Route("search-loaiphong")]
         [HttpGet]
@@ -112,7 +126,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi hệ thống." });
             }
         }
     }

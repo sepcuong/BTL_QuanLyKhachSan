@@ -1,10 +1,12 @@
 ﻿using BLL;
 using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Model;
 
 namespace API.Controllers
 {
+    [Authorize(Roles = "Admin,LeTan")]
     [ApiController]
     [Route("api-admin/[controller]")]
     [Route("api/[controller]")]
@@ -30,30 +32,38 @@ namespace API.Controllers
             {
                 thongtin.Ma_Khach_Hang = Guid.NewGuid().ToString();
                 var isCreate = _khachHangBusiness.Create(thongtin);
-                return Ok(thongtin);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Thêm khách hàng thành công."
+                });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("đã tồn tại"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Dữ liệu khách hàng đã tồn tại." });
                 }
-                throw new Exception("Lỗi hệ thống: " + ex.Message);
+                throw;
             }
         }
 
         [Route("update-khachhang")]
         [HttpPost]
-        public KhachHang UpdateKhachHang([FromBody] KhachHang thongtin)
+        public IActionResult UpdateKhachHang([FromBody] KhachHang thongtin)
         {
             try
             {
-                _khachHangBusiness.Update(thongtin);
-                return thongtin;
+                var isUpdated = _khachHangBusiness.Update(thongtin);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Cập nhật khách hàng thành công."
+                });
             }
             catch (Exception ex)
             {
-                throw new Exception("Có lỗi xảy ra khi cập nhật khách hàng: " + ex.Message);
+                throw;
             }
         }
 
@@ -64,39 +74,44 @@ namespace API.Controllers
             try
             {
                 string khachHang_Id = "";
-                if (formData.Keys.Contains("khachHang_Id") && !string.IsNullOrEmpty(Convert.ToString(formData["khachHang_Id"]))) { khachHang_Id = Convert.ToString(formData["khachHang_Id"]); }
-                var isDelete = _khachHangBusiness.Delete(khachHang_Id);
-                if (isDelete)
+                if (formData.Keys.Contains("khachHang_Id") && !string.IsNullOrWhiteSpace(Convert.ToString(formData["khachHang_Id"])))
                 {
-                    return Ok(new { message = "Xóa khách hàng thành công!" });
+                    khachHang_Id = Convert.ToString(formData["khachHang_Id"]) ?? string.Empty;
                 }
                 else
                 {
-                    return NotFound(new { message = "Không tìm thấy khách hàng để xóa!" });
+                    return BadRequest(new { success = false, message = "Mã khách hàng không được để trống." });
+                }
+                var isDelete = _khachHangBusiness.Delete(khachHang_Id);
+                if (isDelete)
+                {
+                    return Ok(new { success = true, message = "Xóa khách hàng thành công." });
+                }
+                else
+                {
+                    return NotFound(new { success = false, message = "Không tìm thấy khách hàng để xóa." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message != null && ex.Message.Contains("Không thể xóa khách hàng"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Không thể xóa khách hàng khi còn dữ liệu liên quan." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
 
         [Route("get-by-id/{khachHang_Id}")]
         [HttpGet]
-        public KhachHang GetById(string khachHang_Id)
+        public IActionResult GetById(string khachHang_Id)
         {
-            try
+            var khachHang = _khachHangBusiness.GetById(khachHang_Id);
+            if (khachHang == null)
             {
-                return _khachHangBusiness.GetById(khachHang_Id);
+                return NotFound(new { success = false, message = "Không tìm thấy khách hàng." });
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Có lỗi xảy ra khi lấy thông tin khách hàng: " + ex.Message);
-            }
+            return Ok(khachHang);
         }
 
         [Route("search")]
@@ -109,7 +124,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception("Có lỗi xảy ra khi tìm kiếm khách hàng: " + ex.Message);
+                throw;
             }
         }
     }

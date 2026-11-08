@@ -3,10 +3,11 @@ using BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Controllers
 {
-    //[Authorize]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api-admin/[controller]")]
     [Route("api/[controller]")]
@@ -35,15 +36,19 @@ namespace API.Controllers
                 thongtin.User_Id = Guid.NewGuid().ToString();
                 //thongtin.Matkhau = 
                 var isCreate = _userBusiness.Create(thongtin);
-                return Ok(thongtin);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Tạo người dùng thành công."
+                });
                 //return thongtin;
             } catch (Exception ex)
             {
                 if (ex.Message.Contains("đã tồn tại"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Dữ liệu người dùng đã tồn tại." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("update-user")]
@@ -52,34 +57,37 @@ namespace API.Controllers
         {
             try
             {
-                _userBusiness.Update(thongtin);
-                return Ok(thongtin);
-            } catch (Exception ex)
+                var isUpdated = _userBusiness.Update(thongtin);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Cập nhật người dùng thành công."
+                });
+            } catch
             {
-                throw new Exception("Có lỗi xảy ra khi cập nhật người dùng: " + ex.Message);
+                throw;
             }
         }
         [Route("delete-user")]
         [HttpPost]
-        public IActionResult DeleteUser([FromBody] Dictionary<string, object> formData)
+        public IActionResult DeleteUser([FromBody] DeleteUserRequest request)
         {
             try
             {
-                string user_Id = "";
-                if (formData.Keys.Contains("user_Id") && !string.IsNullOrEmpty(Convert.ToString(formData["user_Id"]))) { user_Id = Convert.ToString(formData["user_Id"]); }
-                bool isDelete = _userBusiness.Delete(user_Id);
+                bool isDelete = _userBusiness.Delete(request.user_Id);
                 if (isDelete)
                 {
-                    return Ok(new { message = "Xóa người dùng thành công!" });
+                    return Ok(new { success = true, message = "Xóa người dùng thành công." });
                 }
                 else
                 {
-                    return NotFound(new { message = "Không tìm thấy người dùng để xóa!" });
+                    return NotFound(new { success = false, message = "Không tìm thấy người dùng để xóa." });
                 }
             }
-            catch (Exception ex)
+
+            catch
             {
-                return BadRequest(new { message = "Có lỗi xảy ra khi xóa người dùng!", error = ex.Message });
+                throw;
             }
         }
         [Route("get-by-id/{user_Id}")]
@@ -95,12 +103,12 @@ namespace API.Controllers
                 }
                 else
                 {
-                    return NotFound(new { message = "Không tìm thấy người dùng!" });
+                    return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(new { message = "Có lỗi xảy ra khi lấy thông tin người dùng!", error = ex.Message });
+                throw;
             }
         }
         [Route("search")]
@@ -112,9 +120,9 @@ namespace API.Controllers
                 var users = _userBusiness.Search(keyword);
                 return Ok(users);
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(new { message = "Có lỗi xảy ra khi tìm kiếm người dùng!", error = ex.Message });
+                throw;
             }
         }
         [AllowAnonymous]
@@ -123,7 +131,7 @@ namespace API.Controllers
         public IActionResult Login([FromBody] LoginRequest req)
         {
             var user = _userBusiness.Login(req.TaiKhoan, req.MatKhau);
-            if (user == null) return Unauthorized(new { message = "Tài khoản hoặc mật khẩu không đúng" });
+            if (user == null) return Unauthorized(new { success = false, message = "Tài khoản hoặc mật khẩu không đúng." });
             // trả về user hoặc token tùy implementation
             return Ok(new 
             { 
@@ -134,4 +142,10 @@ namespace API.Controllers
             });
         }
     }
+}
+
+public sealed class DeleteUserRequest
+{
+    [Required]
+    public string user_Id { get; set; } = string.Empty;
 }

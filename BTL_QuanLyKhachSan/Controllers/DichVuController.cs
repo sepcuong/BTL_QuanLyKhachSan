@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Controllers
 {
+    [Authorize(Roles = "Admin,LeTan")]
     [ApiController]
     [Route("api-admin/[controller]")]
     [Route("api/[controller]")]
@@ -27,15 +30,23 @@ namespace API.Controllers
             try
             {
                 thongtin.Ma_Dich_Vu = Guid.NewGuid().ToString();
-                var result =  _dichvubusiness.Create(thongtin);
-                return Ok(result);
+                var result = _dichvubusiness.Create(thongtin);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Thêm dịch vụ thành công."
+                });
             } catch (Exception ex)
             {
                 if (ex.Message.Contains("đã tồn tại"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new 
+                    { 
+                        success = false, 
+                        message = "Dữ liệu dịch vụ đã tồn tại." 
+                    });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
 
@@ -46,12 +57,15 @@ namespace API.Controllers
             try
             {
                 var item = _dichvubusiness.GetDichVuById(id);
-                if (item == null) return NotFound();
+                if (item == null)
+                {
+                    return NotFound(new { success = false, message = "Không tìm thấy dịch vụ." });
+                }
                 return Ok(item);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
 
@@ -62,41 +76,38 @@ namespace API.Controllers
             try
             {
                 if (thongtin == null)
-                    return BadRequest(new { message = "Dữ liệu rỗng." });
+                    return BadRequest(new { success = false, message = "Dữ liệu dịch vụ không được để trống." });
                 if (string.IsNullOrEmpty(thongtin.Ma_Dich_Vu))
-                    return BadRequest(new { message = "Ma_Dich_Vu không được để trống." });
+                    return BadRequest(new { success = false, message = "Mã dịch vụ không được để trống." });
 
                 var result = _dichvubusiness.Update(thongtin);
-                if (!result)
-                    return NotFound(new { message = "Cập nhật thất bại: không tìm thấy dịch vụ." });
-                return Ok(result);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Cập nhật dịch vụ thành công."
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
 
         [Route("delete-dich-vu")]
         [HttpPost]
-        public IActionResult Delete([FromBody] Dictionary<string, object> formData)
+        public IActionResult Delete([FromBody] DeleteDichVuRequest request)
         {
             try
             {
-                string maDichVu_Id = "";
-                if (formData.ContainsKey("maDichVu_Id") && formData["maDichVu_Id"] != null)
-                {
-                    maDichVu_Id = formData["maDichVu_Id"].ToString();
-                }
-                var result = _dichvubusiness.Delete(maDichVu_Id);
+                var result = _dichvubusiness.Delete(request.maDichVu_Id);
                 if (!result)
-                    return NotFound(new { message = "Xóa thất bại: không tìm thấy dịch vụ." });
-                return Ok(new { message = "Xóa thành công" });
+                    return NotFound(new { success = false, message = "Không tìm thấy dịch vụ để xóa." });
+                return Ok(new { success = true, message = "Xóa dịch vụ thành công." });
 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
 
@@ -111,9 +122,16 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
+
         }
         
     }
+}
+
+public sealed class DeleteDichVuRequest
+{
+    [Required]
+    public string maDichVu_Id { get; set; } = string.Empty;
 }

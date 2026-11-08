@@ -1,6 +1,27 @@
 ﻿{
   "Routes": [
     {
+      "DownstreamPathTemplate": "/api/Users/login",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44351
+        }
+      ],
+      "UpstreamPathTemplate": "/api-admin/Users/login",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api-user/Phong/get-all-phong",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        { "Host": "localhost", "Port": 5002 }
+      ],
+      "UpstreamPathTemplate": "/api-user/Phong/get-all-phong",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
       "DownstreamPathTemplate": "/api-user/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -10,7 +31,11 @@
         }
       ],
       "UpstreamPathTemplate": "/api-user/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ]
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
     {
       "DownstreamPathTemplate": "/api/{everything}",
@@ -18,11 +43,15 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5001
+          "Port": 44351
         }
       ],
       "UpstreamPathTemplate": "/api-admin/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     }
   ],
   "GlobalConfiguration": {

@@ -29,14 +29,20 @@ namespace BLL
         }
         public bool Create(User thongtin)
         {
-            thongtin.Matkhau = SecurityHelper.HashPassword(thongtin.Matkhau);
+            thongtin.Matkhau = SecurityHelper.HashPassword(thongtin.Matkhau, thongtin.Taikhoan);
             var result = _res.Create(thongtin);
             Sanitize(thongtin);
             return result;
         }
         public bool Update(User thongtin)
         {
-            thongtin.Matkhau = SecurityHelper.HashPassword(thongtin.Matkhau);
+            var currentUser = _res.GetUserById(thongtin.User_Id);
+            if (currentUser == null)
+                return false;
+
+            thongtin.Matkhau = string.IsNullOrWhiteSpace(thongtin.Matkhau)
+                ? currentUser.Matkhau
+                : SecurityHelper.HashPassword(thongtin.Matkhau, thongtin.Taikhoan);
             var result = _res.Update(thongtin);
             Sanitize(thongtin);
             return result;
@@ -59,16 +65,17 @@ namespace BLL
             if (string.IsNullOrWhiteSpace(taikhoan) || string.IsNullOrEmpty(matkhau))
                 return null;
 
-            var hashed = SecurityHelper.HashPassword(matkhau);
+            var hashed = SecurityHelper.HashPassword(matkhau, taikhoan);
             var user = _res.Login(taikhoan, hashed);
             if (user == null)
-            {
+                user = _res.Login(taikhoan, SecurityHelper.HashLegacyPassword(matkhau));
+            if (user == null)
                 user = _res.Login(taikhoan, matkhau);
-                if (user != null)
-                {
-                    user.Matkhau = hashed;
-                    _res.Update(user);
-                }
+
+            if (user != null && user.Matkhau?.StartsWith("PBKDF2$", StringComparison.Ordinal) != true)
+            {
+                user.Matkhau = SecurityHelper.HashPassword(matkhau, taikhoan);
+                _res.Update(user);
             }
 
             if (user == null)
@@ -81,6 +88,7 @@ namespace BLL
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Hoten ?? string.Empty),
+                    new Claim(ClaimTypes.NameIdentifier, user.User_Id),
                     new Claim(ClaimTypes.StreetAddress, user.Diachi ?? string.Empty),
                     new Claim(ClaimTypes.Role, user.Role ?? string.Empty)
                 }),

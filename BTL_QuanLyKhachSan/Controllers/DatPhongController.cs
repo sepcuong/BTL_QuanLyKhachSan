@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Model;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Controllers
 {
+    [Authorize(Roles = "Admin,LeTan")]
     [ApiController]
     [Route("api-admin/[controller]")]
     [Route("api/[controller]")]
@@ -16,17 +19,6 @@ namespace API.Controllers
             _datPhongBusiness = datPhongBusiness;
         }
 
-        private static string GetFormValue(Dictionary<string, object> formData, params string[] keys)
-        {
-            foreach (var key in keys)
-            {
-                var item = formData.FirstOrDefault(x => string.Equals(x.Key, key, StringComparison.OrdinalIgnoreCase));
-                if (item.Value != null)
-                    return item.Value.ToString() ?? string.Empty;
-            }
-
-            return string.Empty;
-        }
         [Route("get-all-dat-phong")]
         [HttpGet]
         public List<DatPhong> GetAllDatPhong()
@@ -43,19 +35,19 @@ namespace API.Controllers
                     thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
                 thongtin.Ngay_Dat = DateTime.Now;
                 var result = _datPhongBusiness.Create(thongtin);
-                if (!result)
+                return Ok(new
                 {
-                    return BadRequest(new { message = "Tạo đặt phòng thất bại." });
-                }
-                return Ok(thongtin);
+                    success = true,
+                    message = "Tạo đặt phòng thành công."
+                });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không thể") || ex.Message.Contains("không được"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Thông tin đặt phòng không hợp lệ." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("update-dat-phong")]
@@ -65,127 +57,112 @@ namespace API.Controllers
             try
             {
                 var result = _datPhongBusiness.Update(thongtin);
-                if (!result)
+                return Ok(new
                 {
-                    return NotFound(new { message = "Cập nhật đặt phòng thất bại." });
-                }
-                return Ok(thongtin);
+                    success = true,
+                    message = "Cập nhật đặt phòng thành công."
+                });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không thể") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Không thể cập nhật đặt phòng." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("delete-dat-phong")]
         [HttpPost]
-        public IActionResult DeleteDatPhong([FromBody] Dictionary<string, object> formData)
+        public IActionResult DeleteDatPhong([FromBody] DatPhongIdRequest request)
         {
             try
             {
-                string maDatPhong_Id = GetFormValue(formData, "maDatPhong_Id", "maDatPhongId", "Ma_Dat_Phong", "id");
+                string maDatPhong_Id = request.GetId();
                 if (string.IsNullOrWhiteSpace(maDatPhong_Id))
                 {
-                    return BadRequest(new { message = "Mã đặt phòng không được để trống" });
+                    return BadRequest(new { success = false, message = "Mã đặt phòng không được để trống." });
                 }
                 var result = _datPhongBusiness.Delete(maDatPhong_Id);
-                if (!result)
-                {
-                    return NotFound(new { message = "Không tìm thấy đặt phòng để xóa." });
-                }
-                return Ok(new { message = "Xóa thành công" });
+                return Ok(new { success = true, message = "Xóa đặt phòng thành công." });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không được"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Không thể xóa đặt phòng." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("cancel-dat-phong")]
         [HttpPost]
-        public IActionResult CancelDatPhong([FromBody] Dictionary<string, object> formData)
+        public IActionResult CancelDatPhong([FromBody] DatPhongIdRequest request)
         {
             try
             {
-                string maDatPhong_Id = GetFormValue(formData, "maDatPhong_Id", "maDatPhongId", "Ma_Dat_Phong", "id");
+                string maDatPhong_Id = request.GetId();
                 if (string.IsNullOrWhiteSpace(maDatPhong_Id))
                 {
-                    return BadRequest(new { message = "Mã đặt phòng không được để trống" });
+                    return BadRequest(new { success = false, message = "Mã đặt phòng không được để trống." });
                 }
                 var result = _datPhongBusiness.Cancel(maDatPhong_Id);
-                if (!result)
-                {
-                    return NotFound(new { message = "Hủy đặt phòng thất bại." });
-                }
-                return Ok(new { message = "Hủy thành công" });
+                return Ok(new { success = true, message = "Hủy đặt phòng thành công." });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không thể") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Không thể hủy đặt phòng." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("checkin-dat-phong")]
         [HttpPost]
-        public IActionResult CheckInDatPhong([FromBody] Dictionary<string, object> formData)
+        public IActionResult CheckInDatPhong([FromBody] DatPhongIdRequest request)
         {
             try
             {
-                string maDatPhong_Id = GetFormValue(formData, "maDatPhong_Id", "maDatPhongId", "Ma_Dat_Phong", "id");
+                string maDatPhong_Id = request.GetId();
                 if (string.IsNullOrWhiteSpace(maDatPhong_Id))
                 {
-                    return BadRequest(new { message = "Mã đặt phòng không được để trống" });
+                    return BadRequest(new { success = false, message = "Mã đặt phòng không được để trống." });
                 }
                 var result = _datPhongBusiness.CheckIn(maDatPhong_Id);
-                if (!result)
-                {
-                    return NotFound(new { message = "Check-in thất bại." });
-                }
-                return Ok(new { message = "Check-in thành công" });
+                return Ok(new { success = true, message = "Check-in đặt phòng thành công." });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không thể") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Không thể check-in đặt phòng." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("checkout-dat-phong")]
         [HttpPost]
-        public IActionResult CheckOutDatPhong([FromBody] Dictionary<string, object> formData)
+        public IActionResult CheckOutDatPhong([FromBody] DatPhongIdRequest request)
         {
             try
             {
-                string maDatPhong_Id = GetFormValue(formData, "maDatPhong_Id", "maDatPhongId", "Ma_Dat_Phong", "id");
+                string maDatPhong_Id = request.GetId();
                 if (string.IsNullOrWhiteSpace(maDatPhong_Id))
                 {
-                    return BadRequest(new { message = "Mã đặt phòng không được để trống" });
+                    return BadRequest(new { success = false, message = "Mã đặt phòng không được để trống." });
                 }
+
                 var result = _datPhongBusiness.CheckOut(maDatPhong_Id);
-                if (!result)
-                {
-                    return NotFound(new { message = "Check-out thất bại." });
-                }
-                return Ok(new { message = "Check-out thành công" });
+                return Ok(new { success = true, message = "Check-out đặt phòng thành công." });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không thể") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Không thể check-out đặt phòng." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("search-dat-phong")]
@@ -203,13 +180,13 @@ namespace API.Controllers
                 var result = _datPhongBusiness.GetById(phong_Id);
                 if (result == null)
                 {
-                    return NotFound(new { message = $"Không tìm thấy đặt phòng với mã: {phong_Id}" });
+                    return NotFound(new { success = false, message = $"Không tìm thấy đặt phòng với mã: {phong_Id}" });
                 }
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("get-dat-phong-by-khach-hang/{khachHang_Id}")]
@@ -223,7 +200,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("get-dat-phong-by-phong/{phong_Id}")]
@@ -235,14 +212,31 @@ namespace API.Controllers
                 var result = _datPhongBusiness.GetByPhong(phong_Id);
                 if (result == null)
                 {
-                    return NotFound(new { message = $"Không tìm thấy đặt phòng cho phòng với mã: {phong_Id}" });
+                    return NotFound(new { success = false, message = $"Không tìm thấy đặt phòng cho phòng với mã: {phong_Id}." });
                 }
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
     }
+
+public sealed class DatPhongIdRequest : IValidatableObject
+{
+    public string? maDatPhong_Id { get; set; }
+    public string? maDatPhongId { get; set; }
+    public string? Ma_Dat_Phong { get; set; }
+    public string? id { get; set; }
+
+    public string GetId() => new[] { maDatPhong_Id, maDatPhongId, Ma_Dat_Phong, id }
+        .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (string.IsNullOrWhiteSpace(GetId()))
+            yield return new ValidationResult("Mã đặt phòng là bắt buộc.", new[] { nameof(maDatPhong_Id) });
+    }
+}
 }

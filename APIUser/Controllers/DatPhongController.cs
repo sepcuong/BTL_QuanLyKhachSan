@@ -1,10 +1,13 @@
 ﻿using BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model;
+using System.Security.Claims;
 
 namespace APIUser.Controllers
 {
     [ApiController]
+    [Authorize(Roles = "Khach")]
     [Route("api-user/[controller]")]
     public class DatPhongController : ControllerBase
     {
@@ -17,62 +20,20 @@ namespace APIUser.Controllers
         [HttpPost]
         public IActionResult CreateDatPhong([FromBody] DatPhong thongtin)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(thongtin.Ma_Dat_Phong))
-                    thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
-                thongtin.Ngay_Dat = DateTime.Now;
-                var result = _datPhongBusiness.Create(thongtin);
-                if (!result)
-                {
-                    return BadRequest(new { message = "Tạo đặt phòng thất bại." });
-                }
-                return Ok(thongtin);
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không thể") || ex.Message.Contains("không được"))
-                {
-                    return BadRequest(new { message = ex.Message });
-                }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
-            }
-        }
-        [Route("update-dat-phong")]
-        [HttpPost]
-        public IActionResult UpdateDatPhong([FromBody] DatPhong thongtin)
-        {
-            try
-            {
-                var result = _datPhongBusiness.Update(thongtin);
-                if (!result)
-                {
-                    return NotFound(new { message = "Cập nhật đặt phòng thất bại." });
-                }
-                return Ok(thongtin);
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không thể") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
-                {
-                    return BadRequest(new { message = ex.Message });
-                }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
-            }
+            thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
+            thongtin.Ma_Khach_Hang = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            thongtin.Ngay_Dat = DateTime.Now;
+            var result = _datPhongBusiness.Create(thongtin);
+            if (!result)
+                return BadRequest(new { message = "Tạo đặt phòng thất bại." });
+            return Ok(thongtin);
         }
         [Route("get-dat-phong-by-khach-hang/{khachHang_Id}")]
         [HttpGet]
         public IActionResult GetDatPhongByKhachHang(string khachHang_Id)
         {
-            try
-            {
-                var result = _datPhongBusiness.GetByKhachHang(khachHang_Id);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
-            }
+            var ownCustomerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return Ok(_datPhongBusiness.GetByKhachHang(ownCustomerId));
         }
     }
 }

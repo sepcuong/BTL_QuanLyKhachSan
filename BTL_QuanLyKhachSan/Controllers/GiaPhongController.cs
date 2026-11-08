@@ -1,10 +1,13 @@
 ﻿using BLL;
 using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Controllers
 {
+    [Authorize(Roles = "Admin,LeTan")]
     [ApiController]
     [Route("api-admin/[controller]")]
     [Route("api/[controller]")]
@@ -29,15 +32,15 @@ namespace API.Controllers
             {
                 thongtin.Ma_Gia = Guid.NewGuid().ToString(); // Tạo mã giá mới
                 var result = _giaPhongBusiness.Create(thongtin);
-                return Ok(thongtin);
+                return Ok(new { success = true, message = "Thêm giá phòng thành công." });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("đã tồn tại"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Dữ liệu giá phòng đã tồn tại." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("update-gia-phong")]
@@ -47,38 +50,36 @@ namespace API.Controllers
             try
             {
                 var result = _giaPhongBusiness.Update(thongtin);
-                return Ok(thongtin);
+                return Ok(new { success = true, message = "Cập nhật giá phòng thành công." });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("đã tồn tại"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Dữ liệu giá phòng đã tồn tại." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("delete-gia-phong")]
         [HttpPost]
-        public IActionResult DeleteGiaPhong([FromBody] Dictionary<string, object> formData)
+        public IActionResult DeleteGiaPhong([FromBody] DeleteGiaPhongRequest request)
         {
             try
             {
-                string maGia_Id = "";
-                if (formData.Keys.Contains("maGia_Id") && !string.IsNullOrEmpty(Convert.ToString(formData["maGia_Id"]))) { maGia_Id = Convert.ToString(formData["maGia_Id"]); }
-                var isDelete = _giaPhongBusiness.Delete(maGia_Id);
+                var isDelete = _giaPhongBusiness.Delete(request.maGia_Id);
                 if (isDelete)
                 {
-                    return Ok(new { message = "Xóa khách hàng thành công!" });
+                    return Ok(new { success = true, message = "Xóa giá phòng thành công." });
                 }
                 else
                 {
-                    return NotFound(new { message = "Không tìm thấy khách hàng để xóa!" });
+                    return NotFound(new { success = false, message = "Không tìm thấy giá phòng để xóa." });
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("get-gia-phong-by-id/{maGia}")]
@@ -90,13 +91,13 @@ namespace API.Controllers
                 var result = _giaPhongBusiness.GetGiaPhongById(maGia);
                 if (result == null)
                 {
-                    return NotFound(new { message = $"Không tìm thấy giá phòng với mã: {maGia}" });
+                    return NotFound(new { success = false, message = $"Không tìm thấy giá phòng với mã: {maGia}." });
                 }
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("get-gia-phong-by-loai-phong/{maLoaiPhong}")]
@@ -110,7 +111,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("gia-phong-get-current")]
@@ -124,8 +125,15 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
+
         }
     }
+}
+
+public sealed class DeleteGiaPhongRequest
+{
+    [Required]
+    public string maGia_Id { get; set; } = string.Empty;
 }

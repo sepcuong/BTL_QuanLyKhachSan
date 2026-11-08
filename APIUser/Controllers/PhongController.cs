@@ -1,4 +1,5 @@
 ﻿using BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIUser.Controllers
@@ -12,6 +13,7 @@ namespace APIUser.Controllers
         {
             _phongBusiness = phongBusiness;
         }
+        [AllowAnonymous]
         [Route("get-all-phong")]
         [HttpGet]
         public IActionResult GetAllPhong()

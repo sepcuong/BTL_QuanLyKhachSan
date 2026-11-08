@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Model;
 
 namespace API.Controllers
 {
+    [Authorize(Roles = "Admin,KeToan")]
     [ApiController]
     [Route("api-admin/[controller]")]
     [Route("api/[controller]")]
@@ -27,7 +29,10 @@ namespace API.Controllers
         public IActionResult GetById(string id)
         {
             var item = _business.GetHoaDonById(id);
-            if (item == null) return NotFound();
+            if (item == null)
+            {
+                return NotFound(new { success = false, message = "Không tìm thấy hóa đơn." });
+            }
             return Ok(item);
         }
 
@@ -36,7 +41,10 @@ namespace API.Controllers
         public IActionResult GetByDatPhong(string maDatPhong)
         {
             var item = _business.GetByDatPhong(maDatPhong);
-            if (item == null) return NotFound();
+            if (item == null)
+            {
+                return NotFound(new { success = false, message = "Không tìm thấy hóa đơn cho đặt phòng này." });
+            }
             return Ok(item);
         }
 
@@ -56,19 +64,15 @@ namespace API.Controllers
             {
                 thongtin.Ma_Hoa_Don = Guid.NewGuid().ToString();
                 var result = _business.Create(thongtin);
-                if (!result)
-                {
-                    return BadRequest(new { message = "Tạo hóa đơn thất bại." });
-                }
-                return Ok(result);
+                return Ok(new { success = true, message = "Tạo hóa đơn thành công." });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy") || ex.Message.Contains("đã có"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Thông tin hóa đơn không hợp lệ." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi hệ thống." });
             }
         }
 
@@ -79,19 +83,15 @@ namespace API.Controllers
             try
             {
                 var result = _business.Update(thongtin);
-                if (!result)
-                {
-                    return NotFound(new { message = "Cập nhật hóa đơn thất bại." });
-                }
-                return Ok(result);
+                return Ok(new { success = true, message = "Cập nhật hóa đơn thành công." });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy") || ex.Message.Contains("đã"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Thông tin hóa đơn không hợp lệ." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi hệ thống." });
             }
         }
 
@@ -108,26 +108,26 @@ namespace API.Controllers
                 }
                 else
                 {
-                    return BadRequest(new { message = "Mã hóa đơn không được để trống." });
+                    return BadRequest(new { success = false, message = "Mã hóa đơn không được để trống." });
                 }
 
                 var isDelete = _business.Delete(maHoaDon_Id);
                 if (isDelete)
                 {
-                    return Ok(new { message = "Xóa thành công" });
+                    return Ok(new { success = true, message = "Xóa hóa đơn thành công." });
                 }
                 else
                 {
-                    return NotFound(new { message = "Xóa thất bại: không tìm thấy hóa đơn." });
+                    return NotFound(new { success = false, message = "Không tìm thấy hóa đơn để xóa." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không được"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Không thể xóa hóa đơn." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi hệ thống." });
             }
         }
     }

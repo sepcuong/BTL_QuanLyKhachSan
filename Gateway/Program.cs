@@ -1,26 +1,45 @@
 ﻿using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Nạp cấu hình từ ocelot.json
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 
+var secret = builder.Configuration["AppSettings:Secret"];
+if (string.IsNullOrWhiteSpace(secret) || Encoding.UTF8.GetByteCount(secret) < 32)
+    throw new InvalidOperationException("Cấu hình AppSettings:Secret chưa hợp lệ.");
+var key = Encoding.UTF8.GetBytes(secret);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
+builder.Services.AddAuthorization();
+
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
+    options.AddPolicy("ConfiguredOrigins", policy => policy.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader());
 });
 
 builder.Services.AddOcelot(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseCors("AllowAll");
+app.UseCors("ConfiguredOrigins");
+app.UseAuthentication();
+app.UseAuthorization();
 
 await app.UseOcelot();
 

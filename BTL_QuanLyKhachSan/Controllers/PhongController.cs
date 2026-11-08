@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Model;
 
 namespace API.Controllers
 {
+    [Authorize(Roles = "Admin,LeTan")]
     [ApiController]
     [Route("api-admin/[controller]")]
     [Route("api/[controller]")]
@@ -41,19 +43,19 @@ namespace API.Controllers
             {
                 thongtin.Ma_Phong = Guid.NewGuid().ToString(); // Tạo mã phòng mới
                 var result = _phongBusiness.Create(thongtin);
-                if (!result)
+                return Ok(new
                 {
-                    return BadRequest(new { message = "Tạo phòng thất bại." });
-                }
-                return Ok(thongtin);
+                    success = true,
+                    message = "Tạo phòng thành công."
+                });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không được"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Thông tin phòng không hợp lệ hoặc đã tồn tại." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("update-phong")]
@@ -63,19 +65,19 @@ namespace API.Controllers
             try
             {
                 var result = _phongBusiness.Update(thongtin);
-                if (!result)
+                return Ok(new
                 {
-                    return NotFound(new { message = "Cập nhật phòng thất bại." });
-                }
-                return Ok(thongtin);
+                    success = true,
+                    message = "Cập nhật phòng thành công."
+                });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Thông tin phòng không hợp lệ hoặc đã tồn tại." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("delete-phong")]
@@ -85,40 +87,33 @@ namespace API.Controllers
             try
             {
                 string Phong_Id = GetFormValue(formData, "Phong_Id", "maPhong", "maPhong_Id", "id");
+                if (string.IsNullOrWhiteSpace(Phong_Id))
+                {
+                    return BadRequest(new { success = false, message = "Mã phòng không được để trống." });
+                }
                 bool result = _phongBusiness.Delete(Phong_Id);
                 if (result)
                 {
-                    return Ok(new { message = "Xóa phòng thành công!" });
+                    return Ok(new { success = true, message = "Xóa phòng thành công." });
                 }else {                     
-                    return NotFound(new { message = "Không tìm thấy phòng để xóa!" }); 
+                    return NotFound(new { success = false, message = "Không tìm thấy phòng để xóa." }); 
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không tồn tại"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Không thể xóa phòng do dữ liệu không hợp lệ." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("get-by-id/{maPhong}")]
         [HttpGet]
-        public Phong GetById(string maPhong)
+        public IActionResult GetById(string maPhong)
         {
-            try
-            {
-                var result = _phongBusiness.GetPhongById(maPhong);
-                if (result == null)
-                {
-                    throw new Exception($"Không tìm thấy phòng với mã: {maPhong}");
-                }
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Có lỗi xảy ra khi lấy thông tin phòng: " + ex.Message);
-            }
+            var result = _phongBusiness.GetPhongById(maPhong);
+            return result == null ? NotFound(new { success = false, message = "Không tìm thấy phòng." }) : Ok(result);
         }
         [Route("search-phong")]
         [HttpGet]
@@ -131,7 +126,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("update-trangthai")]
@@ -145,19 +140,27 @@ namespace API.Controllers
 
                 if (string.IsNullOrWhiteSpace(maPhong) || string.IsNullOrWhiteSpace(trangThai))
                 {
-                    return BadRequest(new { message = "Mã phòng và trạng thái không được để trống." });
+                    return BadRequest(new { success = false, message = "Mã phòng và trạng thái không được để trống." });
                 }
 
                 var result = _phongBusiness.Update_TrangThai(maPhong, trangThai);
-                return Ok(result);
+                if (result == null)
+                {
+                    return NotFound(new { success = false, message = "Không tìm thấy phòng để cập nhật trạng thái." });
+                }
+                return Ok(new
+                {
+                    success = true,
+                    message = "Cập nhật trạng thái phòng thành công."
+                });
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không được") || ex.Message.Contains("Không tìm thấy"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Trạng thái phòng không hợp lệ." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
         [Route("get-available")]
@@ -169,7 +172,7 @@ namespace API.Controllers
                 var result = _phongBusiness.GetAvailable(ngaynhan, ngaytra);
                 if (result == null)
                 {
-                    return NotFound(new { message = "Không có phòng trống trong khoảng thời gian đã chọn." });
+                    return NotFound(new { success = false, message = "Không có phòng trống trong khoảng thời gian đã chọn." });
                 }
                 return Ok(result);
             }
@@ -177,9 +180,9 @@ namespace API.Controllers
             {
                 if (ex.Message.Contains("Ngày nhận"))
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { success = false, message = "Khoảng ngày không hợp lệ." });
                 }
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
     }

@@ -23,6 +23,13 @@ namespace BLL
             Secret = configuration["AppSettings:Secret"];
             _res = res;
         }
+        public User Register(User thongtin)
+        {
+            thongtin.Matkhau = SecurityHelper.HashPassword(thongtin.Matkhau, thongtin.Taikhoan);
+            var result = _res.Register(thongtin);
+            Sanitize(result);
+            return result;
+        }
         public List<User> GetAllUsers()
         {
             return _res.GetAllUsers().Select(Sanitize).ToList();
@@ -67,16 +74,6 @@ namespace BLL
 
             var hashed = SecurityHelper.HashPassword(matkhau, taikhoan);
             var user = _res.Login(taikhoan, hashed);
-            if (user == null)
-                user = _res.Login(taikhoan, SecurityHelper.HashLegacyPassword(matkhau));
-            if (user == null)
-                user = _res.Login(taikhoan, matkhau);
-
-            if (user != null && user.Matkhau?.StartsWith("PBKDF2$", StringComparison.Ordinal) != true)
-            {
-                user.Matkhau = SecurityHelper.HashPassword(matkhau, taikhoan);
-                _res.Update(user);
-            }
 
             if (user == null)
                 return null;

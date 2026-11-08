@@ -189,20 +189,7 @@ namespace API.Controllers
                 throw;
             }
         }
-        [Route("get-dat-phong-by-khach-hang/{khachHang_Id}")]
-        [HttpGet]
-        public IActionResult GetDatPhongByKhachHang(string khachHang_Id)
-        {
-            try
-            {
-                var result = _datPhongBusiness.GetByKhachHang(khachHang_Id);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
+        
         [Route("get-dat-phong-by-phong/{phong_Id}")]
         [HttpGet]
         public IActionResult GetDatPhongByPhong(string phong_Id)

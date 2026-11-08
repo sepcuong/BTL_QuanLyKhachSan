@@ -9,6 +9,7 @@ namespace BLL.Interfaces
 {
     public partial interface IUserBusiness
     {
+        User Register(User thongtin);
         List<User> GetAllUsers();
         bool Create(User thongtin);
         bool Update(User thongtin);

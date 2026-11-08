@@ -31,10 +31,9 @@ var key = Encoding.UTF8.GetBytes(secret);
 builder.Host.UseSerilog();
 
 builder.Services.AddMemoryCache();
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("ConfiguredOrigins", policy => policy.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader());
+    options.AddPolicy("ConfiguredOrigins", policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 builder.Services.AddScoped<IDatabaseHelper, DatabaseHelper>();
 builder.Services.AddScoped<IUserBusiness, UserBusiness>();

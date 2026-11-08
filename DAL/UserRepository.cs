@@ -17,6 +17,32 @@ namespace DAL
         {
             _dbHelper = dbHelper;
         }
+        public User Register(User thongtin)
+        {
+            try
+            {
+                using var connection = _dbHelper.TConnection();
+                connection.Execute(
+                    "sp_User_Register",
+                    new
+                    {
+                        thongtin.User_Id,
+                        thongtin.Hoten,
+                        thongtin.Email,
+                        thongtin.Taikhoan,
+                        thongtin.Matkhau,
+                        thongtin.So_Dien_Thoai,
+                        Dia_Chi = thongtin.Diachi
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+                return thongtin;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi khi đăng ký: {ex.Message}", ex);
+            }
+        }
         public User Login(string taikhoan, string matkhauHashed)
         {
             try

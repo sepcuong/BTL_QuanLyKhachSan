@@ -9,6 +9,7 @@ namespace DAL
 {
     public interface IUserRepository
     {
+        User Register(User thongtin);
         List<User> GetAllUsers();
         bool Create(User thongtin);
         bool Update(User thongtin);

@@ -108,6 +108,29 @@ CREATE TABLE [hoa_don_khach_san](
 GO
 
 
+CREATE OR ALTER PROCEDURE dbo.sp_User_Register
+    @User_Id VARCHAR(50), @Hoten NVARCHAR(150), @Email VARCHAR(150),
+    @Taikhoan VARCHAR(30), @Matkhau VARCHAR(60),
+    @So_Dien_Thoai VARCHAR(15) = NULL, @Dia_Chi NVARCHAR(250) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF EXISTS (SELECT 1 FROM dbo.[user] WHERE taikhoan = @Taikhoan)
+        THROW 50002, N'Tài khoản đã tồn tại.', 1;
+    BEGIN TRAN;
+    INSERT INTO dbo.[user](user_id, hoten, diachi, email, taikhoan, matkhau, role)
+    VALUES (@User_Id, @Hoten, @Dia_Chi, @Email, @Taikhoan, @Matkhau, N'Khach');
+    INSERT INTO dbo.khach_hang(ma_khach_hang, ho_ten, so_dien_thoai, email, dia_chi)
+    VALUES (@User_Id, @Hoten, @So_Dien_Thoai, @Email, @Dia_Chi);
+    COMMIT;
+    SELECT '';
+END;
+GO
+SELECT * FROM [dbo].[user]
+SELECT * FROM [dbo].[khach_hang]
+
+
+
 CREATE OR ALTER PROCEDURE dbo.sp_User_GetAll
 AS
 BEGIN
@@ -1965,7 +1988,14 @@ END;
 GO
 
 
-
+EXEC dbo.sp_User_Register
+    @User_Id       = '819306b5-207c-4b8c-a8dd-4c4de476bdc8',
+    @Hoten         = N'Nguyễn Văn Test',
+    @Email         = 'bkgasydguaw@gmail.com',
+    @Taikhoan      = 'bkgasydguaw',
+    @Matkhau       = 'e10adc3949ba59abbe56e057f20f883e',
+    @So_Dien_Thoai = '0900000000',
+    @Dia_Chi       = N'Hà Nội'; 
 
 INSERT INTO [user] 
 ([user_id], [hoten], [ngaysinh], [diachi], [gioitinh], [email], [taikhoan], [matkhau], [role], [image_url]) 
@@ -1980,8 +2010,8 @@ VALUES
 ('381a6cbe-b247-4f75-aaa4-b85d128d8509', N'Lê Hoàng Anh', '2002-05-20', N'Hải Phòng', N'Nam', 'hoanganh@gmail.com', 'khach01', '123456', 'Khach', NULL);
 GO
 SELECT * FROM [dbo].[user]
-SELECT * FROM [dbo].[loai_phong]
 SELECT * FROM [dbo].[khach_hang]
+SELECT * FROM [dbo].[loai_phong]
 SELECT COUNT(1) FROM [dbo].[user] WHERE [taikhoan] = 'qcuong35'
 
 INSERT INTO [dbo].[khach_hang] 

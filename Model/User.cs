@@ -13,6 +13,8 @@ public partial class User
 
     public string? Diachi { get; set; }
 
+    public string? So_Dien_Thoai { get; set; }
+
     public string? Gioitinh { get; set; }
 
     public string? Email { get; set; }

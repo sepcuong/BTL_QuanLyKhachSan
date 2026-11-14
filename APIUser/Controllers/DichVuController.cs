@@ -14,9 +14,9 @@ namespace APIUser.Controllers
         {
             _dichvubusiness = dichvubusiness;
         }
+        [AllowAnonymous]
         [Route("get-all-dich-vu")]
         [HttpGet]
-        [Authorize(Roles = "Khach")]
         public List<DichVu> GetAllDichVu()
         {
             return _dichvubusiness.GetAllDichVu();

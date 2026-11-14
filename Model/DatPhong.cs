@@ -9,7 +9,8 @@ public partial class DatPhong
 
     public string Ma_Khach_Hang { get; set; } = null!;
 
-    public string Ma_Phong { get; set; } = null!;
+    public string? Ma_Phong { get; set; } = null!;
+    public List<string>? List_Ma_Phong { get; set; }
 
     public DateTime? Ngay_Dat { get; set; }
 

@@ -1,6 +1,26 @@
 ﻿{
   "Routes": [
     {
+      "DownstreamPathTemplate": "/api-user/Users/login-user",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        { "Host": "localhost", "Port": 5002 }
+      ],
+      "UpstreamPathTemplate": "/api-user/Users/login-user",
+      "UpstreamHttpMethod": [ "POST" ],
+      "Priority": 10
+    },
+    {
+      "DownstreamPathTemplate": "/api-user/Users/register-user",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        { "Host": "localhost", "Port": 5002 }
+      ],
+      "UpstreamPathTemplate": "/api-user/Users/register-user",
+      "UpstreamHttpMethod": [ "POST" ],
+      "Priority": 10
+    },
+    {
       "DownstreamPathTemplate": "/api/Users/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -19,6 +39,18 @@
         { "Host": "localhost", "Port": 5002 }
       ],
       "UpstreamPathTemplate": "/api-user/Phong/get-all-phong",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api-user/DichVu/get-all-dich-vu",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ],
+      "UpstreamPathTemplate": "/api-user/DichVu/get-all-dich-vu",
       "UpstreamHttpMethod": [ "GET" ]
     },
     {

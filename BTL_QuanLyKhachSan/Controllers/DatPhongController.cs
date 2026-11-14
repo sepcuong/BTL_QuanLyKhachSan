@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Model;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -27,28 +28,26 @@ namespace API.Controllers
         }
         [Route("create-dat-phong")]
         [HttpPost]
-        public IActionResult CreateDatPhong([FromBody] DatPhong thongtin)
+        public IActionResult CreateDatPhong([FromBody] List<DatPhong> thongtin)
         {
-            try
+            foreach (var item in thongtin)
             {
-                if (string.IsNullOrWhiteSpace(thongtin.Ma_Dat_Phong))
-                    thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
-                thongtin.Ngay_Dat = DateTime.Now;
-                var result = _datPhongBusiness.Create(thongtin);
-                return Ok(new
-                {
-                    success = true,
-                    message = "Tạo đặt phòng thành công."
-                });
+                item.Ma_Dat_Phong = Guid.NewGuid().ToString();
+                item.Ma_Khach_Hang = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                item.Ngay_Dat = DateTime.Now;
+                var result = _datPhongBusiness.Create(item);
+                if (!result)
+                    return BadRequest(new { message = "Tạo đặt phòng thất bại." });
             }
-            catch (Exception ex)
+            //thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
+            //thongtin.Ma_Khach_Hang = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            //thongtin.Ngay_Dat = DateTime.Now;
+            //var result = _datPhongBusiness.Create(item);
+            return Ok(new
             {
-                if (ex.Message.Contains("đã tồn tại") || ex.Message.Contains("không hợp lệ") || ex.Message.Contains("không thể") || ex.Message.Contains("không được"))
-                {
-                    return BadRequest(new { success = false, message = "Thông tin đặt phòng không hợp lệ." });
-                }
-                throw;
-            }
+                success = true,
+                message = "Tạo đặt phòng thành công."
+            });
         }
         [Route("update-dat-phong")]
         [HttpPost]

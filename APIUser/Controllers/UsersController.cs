@@ -6,8 +6,8 @@ using System.Security.Claims;
 
 namespace APIUser.Controllers
 {
-    [ApiController]
     [Authorize(Roles = "Khach")]
+    [ApiController]
     [Route("api-user/[controller]")]
     public class UsersController : ControllerBase
     {
@@ -42,17 +42,17 @@ namespace APIUser.Controllers
         [Route("login-user")]
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult Login([FromBody] User user)
+        public IActionResult Login([FromBody] LoginRequest request)
         {
-            if (user == null || string.IsNullOrWhiteSpace(user.Taikhoan) || string.IsNullOrEmpty(user.Matkhau))
+            if (request == null || string.IsNullOrWhiteSpace(request.TaiKhoan) || string.IsNullOrEmpty(request.MatKhau))
                 return BadRequest(new { success = false, message = "Tên đăng nhập và mật khẩu không được để trống." });
 
-            var token = _userBusiness.Login(user.Taikhoan, user.Matkhau);
+            var token = _userBusiness.Login(request.TaiKhoan, request.MatKhau);
             if (token == null)
             {
                 return Unauthorized(new { success = false, message = "Tên đăng nhập hoặc mật khẩu không đúng." });
             }
-            return Ok(new { success = true, token });
+            return Ok(new { success = true, token.Token });
         }
         [Route("update-user")]
         [HttpPost]

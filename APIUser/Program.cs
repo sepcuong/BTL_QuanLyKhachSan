@@ -19,11 +19,6 @@ var key = Encoding.UTF8.GetBytes(secret);
 Log.Logger = new LoggerConfiguration().MinimumLevel.Information().WriteTo.Console().WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day).CreateLogger();
 builder.Host.UseSerilog();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("ConfiguredOrigins", policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-});
-
 // 2. Đăng ký Dependency Injection cho DatabaseHelper, DAL và BLL
 builder.Services.AddScoped<IDatabaseHelper, DatabaseHelper>();
 
@@ -91,7 +86,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<APIUser.ApiExceptionMiddleware>();
-app.UseCors("ConfiguredOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();

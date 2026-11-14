@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BLL;
 using BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Model;
 
 namespace API.Controllers
@@ -58,13 +59,52 @@ namespace API.Controllers
 
         [Route("create-hoa-don")]
         [HttpPost]
-        public IActionResult Create([FromBody] HoaDonKhachSan thongtin)
+        public IActionResult Create([FromBody] List<HoaDonKhachSan> thongtin)
         {
             try
             {
-                thongtin.Ma_Hoa_Don = Guid.NewGuid().ToString();
-                var result = _business.Create(thongtin);
-                return Ok(new { success = true, message = "Tạo hóa đơn thành công." });
+                double tongTienPhongDoan = 0;
+                double tongTienDichVuDoan = 0;
+                double tongVatDoan = 0;
+                var danhSachMaHoaDon = new List<string>();
+                foreach (var item in thongtin)
+                {
+                    item.Ma_Hoa_Don = Guid.NewGuid().ToString();
+
+                    double tienDvPhong = 0;
+                    if (item.listjson_dichvu != null && item.listjson_dichvu.Count > 0)
+                    {
+                        foreach (var dv in item.listjson_dichvu)
+                        {
+                            if (string.IsNullOrEmpty(dv.Ma_Chi_Tiet_Dv))
+                                dv.Ma_Chi_Tiet_Dv = Guid.NewGuid().ToString();
+                            tienDvPhong += dv.Thanh_Tien;
+                        }
+                    }
+
+                    _business.Create(item);
+
+                    danhSachMaHoaDon.Add(item.Ma_Hoa_Don);
+                    tongTienPhongDoan += item.Tong_Tien_Phong;
+                    tongTienDichVuDoan += tienDvPhong;
+                    tongVatDoan += item.Thue_Vat ?? 0;
+                }
+
+                double tongThanhToanDoan = tongTienPhongDoan + tongTienDichVuDoan + tongVatDoan;
+
+                return Ok(new
+                {
+                    message = $"Thanh toán và xuất hóa đơn thành công cho {thongtin.Count} phòng!",
+                    so_luong_phong = thongtin.Count,
+                    danh_sach_ma_hoa_don = danhSachMaHoaDon,
+                    tong_tien_phong_doan = tongTienPhongDoan,
+                    tong_tien_dich_vu_doan = tongTienDichVuDoan,
+                    tong_thue_vat_doan = tongVatDoan,
+                    tong_thanh_toan_cuoi_cung = tongThanhToanDoan
+                });
+                //thongtin.Ma_Hoa_Don = Guid.NewGuid().ToString();
+                //var result = _business.Create(thongtin);
+                //return Ok(new { success = true, message = "Tạo hóa đơn thành công." });
             }
             catch (Exception ex)
             {

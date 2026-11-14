@@ -18,14 +18,21 @@ namespace APIUser.Controllers
         }
         [Route("create-dat-phong")]
         [HttpPost]
-        public IActionResult CreateDatPhong([FromBody] DatPhong thongtin)
+        public IActionResult CreateDatPhong([FromBody] List<DatPhong> thongtin)
         {
-            thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
-            thongtin.Ma_Khach_Hang = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            thongtin.Ngay_Dat = DateTime.Now;
-            var result = _datPhongBusiness.Create(thongtin);
-            if (!result)
-                return BadRequest(new { message = "Tạo đặt phòng thất bại." });
+            foreach (var item in thongtin)
+            {
+                item.Ma_Dat_Phong = Guid.NewGuid().ToString();
+                item.Ma_Khach_Hang = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                item.Ngay_Dat = DateTime.Now;
+                var result = _datPhongBusiness.Create(item);
+                if (!result)
+                    return BadRequest(new { message = "Tạo đặt phòng thất bại." });
+            }
+            //thongtin.Ma_Dat_Phong = Guid.NewGuid().ToString();
+            //thongtin.Ma_Khach_Hang = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            //thongtin.Ngay_Dat = DateTime.Now;
+            //var result = _datPhongBusiness.Create(item);
             return Ok(new
             {
                 success = true,

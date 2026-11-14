@@ -20,6 +20,6 @@ public partial class HoaDonKhachSan
     public double Tong_Thanh_Toan { get; set; }
 
     public string? Phuong_Thuc_Thanh_Toan { get; set; }
-
+    public List<ChiTietSuDungDv>? listjson_dichvu { get; set; }
     //public virtual DatPhong MaDatPhongNavigation { get; set; } = null!;
 }
